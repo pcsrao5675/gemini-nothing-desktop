@@ -1,0 +1,12 @@
+[Unit]
+Description=Gemini Floating Assistant Background Daemon
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/brave --user-data-dir=%h/.local/share/gemini-assistant/brave-profile --app=https://gemini.google.com/app --class=gemini-floating-assistant --window-size=410,710 --window-position=1490,330 --load-extension=%h/.local/share/gemini-assistant/extension --remote-debugging-port=9222
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

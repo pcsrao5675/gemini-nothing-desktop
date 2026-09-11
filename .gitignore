@@ -1,0 +1,30 @@
+# Bytecode and Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Browser runtime data & authentication profiles
+brave-profile/
+web-profile/
+
+# Logs and temporary files
+*.log
+/tmp/
+*.tmp
+*.swp
+*.bak
+
+# Security credentials and secrets
+*.pem
+*.key
+token*
+*token*
+*.cert
+
+# macOS / OS metadata
+.DS_Store
+Thumbs.db
+
+# Agent coordination metadata (internal orchestrator state)
+.agents/

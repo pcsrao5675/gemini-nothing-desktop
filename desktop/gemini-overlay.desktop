@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Gemini
+Comment=Google Gemini AI Assistant
+Exec=gemini-toggle.sh
+Icon=starred
+Type=Application
+Categories=Utility;X-AI;
+Keywords=ai;gemini;google;assistant;
+StartupNotify=false
+StartupWMClass=brave-gemini.google.com__app-Default
+X-KDE-GlobalAccel-CommandShortcut=true
+X-KDE-Shortcuts=Launch (2),Launch (1),Launch (C),Meta+Space

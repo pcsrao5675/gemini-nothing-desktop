@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Gemini Screen Attacher",
+  "version": "1.0",
+  "description": "Adds an Android-style 'Attach Screen' button to Gemini web",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["https://gemini.google.com/*"],
+      "js": ["content.js"],
+      "css": ["style.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
