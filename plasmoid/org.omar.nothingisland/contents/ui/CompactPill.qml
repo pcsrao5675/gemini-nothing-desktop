@@ -268,6 +268,32 @@ Item {
                 visible: Cfg.showWeather
             }
 
+            MiniPlayer {
+                id: mini
+                rootItem: root.rootItem
+                pill: root
+                anchors.verticalCenter: parent.verticalCenter
+
+                // entra creciendo suavemente cuando hay reproducción activa
+                opacity: active ? 1 : 0
+                scale: active ? 1 : 0.72
+                visible: opacity > 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.durMedium
+                    }
+                }
+                Behavior on scale {
+                    SpringAnimation {
+                        spring: 9.0
+                        damping: 0.5
+                        mass: 0.35
+                        epsilon: 0.005
+                    }
+                }
+            }
+
             // ── gemini ai button (nothing os style) ──
             Rectangle {
                 id: geminiBtn
@@ -365,8 +391,8 @@ Item {
             }
         }
 
-        // grupo derecho: MiniPlayer (si suena algo) + controles del sistema (red, volumen, brillo, batería)
-        // Todo visible lado a lado sin tapar ni ocultar nada gracias al espacio edge-to-edge
+        // grupo derecho: controles del sistema (red, volumen, brillo, batería, notificaciones)
+        // MiniPlayer se ha movido al grupo izquierdo para aparecer junto a gemini/workspaces
         Row {
             id: rightGroup
             z: 10
@@ -374,32 +400,6 @@ Item {
             anchors.rightMargin: 20
             anchors.verticalCenter: parent.verticalCenter
             spacing: 14
-
-            MiniPlayer {
-                id: mini
-                rootItem: root.rootItem
-                pill: root
-                anchors.verticalCenter: parent.verticalCenter
-
-                // entra creciendo suavemente cuando hay reproducción activa
-                opacity: active ? 1 : 0
-                scale: active ? 1 : 0.72
-                visible: opacity > 0
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.durMedium
-                    }
-                }
-                Behavior on scale {
-                    SpringAnimation {
-                        spring: 9.0
-                        damping: 0.5
-                        mass: 0.35
-                        epsilon: 0.005
-                    }
-                }
-            }
 
             Row {
                 id: rightRow
@@ -521,9 +521,63 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: Cfg.showBattery && present
                 }
+
+                // ── notificaciones compact ──
+                Item {
+                    id: notifItem
+                    anchors.verticalCenter: parent.verticalCenter
+                    implicitWidth: 28
+                    implicitHeight: 28
+                    width: implicitWidth
+                    height: implicitHeight
+
+                    Text {
+                        id: notifBell
+                        anchors.centerIn: parent
+                        text: Notifs.muted ? "notifications_off" : "notifications"
+                        color: Notifs.muted ? Theme.outline
+                             : Notifs.count > 0 ? Theme.fg
+                             : Theme.fgDim
+                        font.family: Theme.fontIcons
+                        font.pixelSize: 18
+                    }
+
+                    // red badge with unread count
+                    Rectangle {
+                        id: notifBadge
+                        visible: Notifs.count > 0 && !Notifs.muted
+                        anchors.top: notifBell.top
+                        anchors.topMargin: -3
+                        anchors.right: notifBell.right
+                        anchors.rightMargin: -4
+                        width: notifBadgeTxt.implicitWidth + 6
+                        height: 14
+                        radius: 7
+                        color: Theme.alert
+
+                        Text {
+                            id: notifBadgeTxt
+                            anchors.centerIn: parent
+                            text: Notifs.count > 99 ? "99+" : Notifs.count
+                            color: "#ffffff"
+                            font.family: Theme.font
+                            font.pixelSize: 9
+                            font.weight: Font.Bold
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        anchors.margins: -4
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.toggleDropdown("notif", notifItem)
+                    }
+                }
             }
         }
     }
+
 
     // ── Dedicated Standalone Dropdown Dialog (opens directly below clicked icon) ──
     PlasmaCore.Dialog {
@@ -540,7 +594,7 @@ Item {
 
         mainItem: Rectangle {
             id: dropdownBox
-            width: root.activeDropdown === "media" ? 400 : 380
+            width: root.activeDropdown === "media" ? 400 : (root.activeDropdown === "notif" ? 390 : 380)
             implicitHeight: dropdownLoader.item ? dropdownLoader.item.implicitHeight + 28 : 200
             height: implicitHeight
             radius: Theme.shapeLg
@@ -566,6 +620,8 @@ Item {
                         return powerComp;
                     if (root.activeDropdown === "media")
                         return mediaComp;
+                    if (root.activeDropdown === "notif")
+                        return notifComp;
                     return null;
                 }
             }
@@ -615,6 +671,16 @@ Item {
                 id: mediaComp
                 MediaCard {
                     width: parent.width
+                }
+            }
+
+            Component {
+                id: notifComp
+                NotifPanel {
+                    onClosed: {
+                        dropdownDialog.visible = false;
+                        root.activeDropdown = "";
+                    }
                 }
             }
         }

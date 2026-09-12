@@ -119,10 +119,10 @@ Item {
 
                 Kirigami.Icon {
                     anchors.verticalCenter: parent.verticalCenter
-                    source: Notifs.current?.icon ?? ""
+                    source: (Notifs.current && Notifs.current.icon) ? Notifs.current.icon : ""
                     implicitWidth: 28
                     implicitHeight: 28
-                    visible: (Notifs.current?.icon ?? "") !== ""
+                    visible: source !== ""
                 }
 
                 Column {
@@ -132,7 +132,7 @@ Item {
 
                     Text {
                         width: parent.width
-                        text: Notifs.current?.summary ?? ""
+                        text: (Notifs.current && Notifs.current.summary) ? Notifs.current.summary : ""
                         color: Theme.fg
                         font.family: Theme.font
                         font.pixelSize: Theme.bodySmall
@@ -141,7 +141,7 @@ Item {
                     }
                     Text {
                         width: parent.width
-                        text: Notifs.current?.body ?? ""
+                        text: (Notifs.current && Notifs.current.body) ? Notifs.current.body : ""
                         color: Theme.fgDim
                         font.family: Theme.font
                         font.pixelSize: Theme.labelSmall
@@ -306,21 +306,21 @@ Item {
                         }
                     }
 
+                    // ── reproductor ──
+                    MediaCard {
+                        width: parent.width
+                    }
+
                     // ── red · bluetooth · sonido ──
                     StatusPills {
                         width: parent.width
                         onRequestPanel: mode => root.openOverlay(mode)
                     }
 
-                    // ── reproductor ──
-                    MediaCard {
-                        width: parent.width
-                    }
-
                     // ── grabación + medidores ──
                     Item {
                         width: parent.width
-                        height: 106
+                        height: SysInfo.amdGpuAvailable ? 150 : 106
 
                         Rectangle {
                             id: recCard

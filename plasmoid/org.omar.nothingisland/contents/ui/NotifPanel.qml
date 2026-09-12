@@ -9,9 +9,34 @@ Item {
 
     signal closed
 
-    implicitHeight: col.implicitHeight + 44
+    implicitHeight: col.implicitHeight + 10
 
     readonly property int count: Notifs.count
+
+    // ── relative timestamp helper ──
+    function relativeTime(dt) {
+        if (!dt || !(dt instanceof Date) || isNaN(dt.getTime()))
+            return "";
+        var now = new Date();
+        var secs = Math.floor((now - dt) / 1000);
+        if (secs < 5)  return Cfg.t("AHORA");
+        if (secs < 60) return secs + "s";
+        var mins = Math.floor(secs / 60);
+        if (mins < 60) return mins + "m";
+        var hrs = Math.floor(mins / 60);
+        if (hrs < 24)  return hrs + "h";
+        var days = Math.floor(hrs / 24);
+        return days + "d";
+    }
+
+    // refreshes every 30s so relative timestamps stay fresh
+    Timer {
+        id: tsRefresh
+        interval: 30000
+        running: true
+        repeat: true
+        triggeredOnStart: true
+    }
 
     Column {
         id: col
@@ -174,107 +199,256 @@ Item {
             visible: popup.count > 0
         }
 
-        // ── lista ──
-        // mismo historial que usa plasma, los delegates leen los roles directo
-        Column {
+        // ── lista con scroll ──
+        Item {
             width: parent.width
-            spacing: 2
+            height: popup.count > 0 ? Math.min(340, notifListCol.implicitHeight) : 0
+            visible: popup.count > 0
+            clip: true
 
-            Repeater {
-                model: Notifs.model
+            Flickable {
+                id: notifFlick
+                anchors.fill: parent
+                contentHeight: notifListCol.implicitHeight
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
 
-                Rectangle {
-                    id: nrow
-                    required property int index
-                    required property string summary
-                    required property string body
-                    required property string applicationIconName
+                Column {
+                    id: notifListCol
+                    width: parent.width
+                    spacing: 5
 
-                    width: col.width
-                    height: 56
-                    radius: Theme.shapeMd
-                    color: nrowMa.containsMouse ? Qt.alpha(Theme.fg, Theme.stateHover) : Qt.alpha(Theme.fg, 0)
+                    Repeater {
+                        model: Notifs.model
 
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.durShort
+                        Rectangle {
+                            id: nrow
+                            required property int index
+                            required property string summary
+                            required property string body
+                            required property string applicationIconName
+                            required property string applicationName
+                            required property var created          // Date
+                            required property var actionNames      // list<string> | undefined
+                            required property var actionLabels     // list<string> | undefined
+                            required property int urgency          // 1=low, 2=normal, 4=critical
+
+                            readonly property bool isCritical: nrow.urgency === 4   // NM.Notifications.CriticalUrgency
+                            readonly property bool hasActions: Array.isArray(nrow.actionNames) && nrow.actionNames.length > 0
+
+                            width: notifListCol.width
+                            // base 56px; add room for action buttons below
+                            height: 56 + (nrow.hasActions ? (Math.ceil(nrow.actionNames.length / 2) * 28 + 8) : 0)
+                            radius: Theme.shapeMd
+                            clip: true
+
+                            color: nrowMa.containsMouse ? Qt.alpha(Theme.fg, Theme.stateHover) : Qt.alpha(Theme.fg, 0)
+
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.durShort
+                                }
+                            }
+
+                            // ── critical urgency: colored left stripe ──
+                            Rectangle {
+                                anchors.left: parent.left
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                width: 3
+                                radius: 1
+                                color: Theme.alert
+                                visible: nrow.isCritical
+                            }
+
+                            // ── app icon ──
+                            Kirigami.Icon {
+                                id: nicon
+                                anchors.left: parent.left
+                                anchors.leftMargin: nrow.isCritical ? 13 : 10
+                                anchors.top: parent.top
+                                anchors.topMargin: 14
+                                implicitWidth: 26
+                                implicitHeight: 26
+                                source: nrow.applicationIconName
+                                visible: nrow.applicationIconName !== ""
+                            }
+
+                            // fallback icon when no app icon
+                            Text {
+                                anchors.left: parent.left
+                                anchors.leftMargin: nrow.isCritical ? 13 : 10
+                                anchors.top: parent.top
+                                anchors.topMargin: 14
+                                visible: !nicon.visible
+                                text: "notifications"
+                                color: Theme.fgFaint
+                                font.family: Theme.fontIcons
+                                font.pixelSize: 20
+                            }
+
+                            // ── text: summary + body + app name ──
+                            Column {
+                                id: ntextCol
+                                anchors.left: parent.left
+                                anchors.leftMargin: (nrow.isCritical ? 13 : 10) + 26 + 10
+                                anchors.right: ndismiss.left
+                                anchors.rightMargin: 6
+                                anchors.top: parent.top
+                                anchors.topMargin: nrow.body !== "" ? 8 : 18
+                                spacing: 1
+
+                                Text {
+                                    width: parent.width
+                                    text: nrow.summary
+                                    color: Theme.fg
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.bodySmall
+                                    font.weight: Font.Medium
+                                    elide: Text.ElideRight
+                                    maximumLineCount: 1
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: nrow.body
+                                    color: Theme.fgVariant
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.labelSmall
+                                    elide: Text.ElideRight
+                                    visible: text !== ""
+                                    maximumLineCount: 2
+                                    wrapMode: Text.WordWrap
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: nrow.applicationName
+                                    color: Theme.fgFaint
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.labelSmall
+                                    font.letterSpacing: 0.3
+                                    elide: Text.ElideRight
+                                    visible: text !== ""
+                                }
+                            }
+
+                            // ── timestamp (top-right, left of dismiss) ──
+                            Text {
+                                id: nts
+                                anchors.right: ndismiss.left
+                                anchors.rightMargin: 6
+                                anchors.top: parent.top
+                                anchors.topMargin: 10
+                                text: popup.relativeTime(nrow.created)
+                                color: Theme.fgFaint
+                                font.family: Theme.font
+                                font.pixelSize: Theme.labelSmall
+                                // re-evaluate every 30s via tsRefresh
+                                property bool _tick: tsRefresh.running
+                            }
+
+                            // ── dismiss button ──
+                            Text {
+                                id: ndismiss
+                                anchors.right: parent.right
+                                anchors.rightMargin: 10
+                                anchors.top: parent.top
+                                anchors.topMargin: 10
+                                text: "close"
+                                color: dismissMa.containsMouse ? Theme.fg : Theme.outline
+                                font.family: Theme.fontIcons
+                                font.pixelSize: 16
+
+                                MouseArea {
+                                    id: dismissMa
+                                    anchors.fill: parent
+                                    anchors.margins: -6
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: Notifs.dismissAt(nrow.index)
+                                }
+                            }
+
+                            // ── action buttons ──
+                            Flow {
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.leftMargin: (nrow.isCritical ? 13 : 10) + 26 + 10
+                                anchors.rightMargin: 10
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 6
+                                spacing: 6
+                                visible: nrow.hasActions
+
+                                Repeater {
+                                    model: nrow.hasActions ? nrow.actionNames : []
+
+                                    Rectangle {
+                                        id: actionBtn
+                                        required property int index
+                                        required property string modelData   // actionName (id)
+
+                                        readonly property string actionLabel: {
+                                            if (Array.isArray(nrow.actionLabels) && nrow.actionLabels.length > actionBtn.index)
+                                                return nrow.actionLabels[actionBtn.index];
+                                            return actionBtn.modelData;
+                                        }
+
+                                        height: 22
+                                        width: Math.min(actionLabelTxt.implicitWidth + 18, 130)
+                                        radius: height / 2
+                                        color: actionBtnMa.containsMouse ? Theme.surfaceTop : Theme.surfaceHigh
+                                        border.width: 1
+                                        border.color: Theme.outline
+
+                                        Behavior on color {
+                                            ColorAnimation { duration: Theme.durShort }
+                                        }
+
+                                        Text {
+                                            id: actionLabelTxt
+                                            anchors.centerIn: parent
+                                            text: actionBtn.actionLabel
+                                            color: Theme.fg
+                                            font.family: Theme.font
+                                            font.pixelSize: Theme.labelSmall
+                                            font.weight: Font.Medium
+                                            elide: Text.ElideRight
+                                            width: Math.min(implicitWidth, 112)
+                                        }
+
+                                        MouseArea {
+                                            id: actionBtnMa
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                Notifs.model.invokeAction(
+                                                    Notifs.model.index(nrow.index, 0),
+                                                    actionBtn.modelData
+                                                );
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            MouseArea {
+                                id: nrowMa
+                                anchors.fill: parent
+                                anchors.rightMargin: 36
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    try {
+                                        if (Notifs.model && Notifs.model.invokeDefaultAction) {
+                                            Notifs.model.invokeDefaultAction(Notifs.model.index(nrow.index, 0));
+                                        }
+                                    } catch (e) {}
+                                }
+                            }
                         }
-                    }
-
-                    Kirigami.Icon {
-                        id: nicon
-                        anchors.left: parent.left
-                        anchors.leftMargin: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        implicitWidth: 26
-                        implicitHeight: 26
-                        source: nrow.applicationIconName
-                        visible: nrow.applicationIconName !== ""
-                    }
-
-                    Text {
-                        anchors.centerIn: nicon
-                        visible: !nicon.visible
-                        text: "notifications"
-                        color: Theme.fgFaint
-                        font.family: Theme.fontIcons
-                        font.pixelSize: 20
-                    }
-
-                    Column {
-                        anchors.left: nicon.right
-                        anchors.leftMargin: 10
-                        anchors.right: ndismiss.left
-                        anchors.rightMargin: 6
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 1
-
-                        Text {
-                            width: parent.width
-                            text: nrow.summary
-                            color: Theme.fg
-                            font.family: Theme.font
-                            font.pixelSize: Theme.bodySmall
-                            font.weight: Font.Medium
-                            elide: Text.ElideRight
-                        }
-
-                        Text {
-                            width: parent.width
-                            text: nrow.body
-                            color: Theme.fgVariant
-                            font.family: Theme.font
-                            font.pixelSize: Theme.labelSmall
-                            elide: Text.ElideRight
-                            visible: text !== ""
-                        }
-                    }
-
-                    Text {
-                        id: ndismiss
-                        anchors.right: parent.right
-                        anchors.rightMargin: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "close"
-                        color: dismissMa.containsMouse ? Theme.fg : Theme.outline
-                        font.family: Theme.fontIcons
-                        font.pixelSize: 16
-
-                        MouseArea {
-                            id: dismissMa
-                            anchors.fill: parent
-                            anchors.margins: -6
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Notifs.dismissAt(nrow.index)
-                        }
-                    }
-
-                    MouseArea {
-                        id: nrowMa
-                        anchors.fill: parent
-                        anchors.rightMargin: 30
-                        hoverEnabled: true
                     }
                 }
             }
