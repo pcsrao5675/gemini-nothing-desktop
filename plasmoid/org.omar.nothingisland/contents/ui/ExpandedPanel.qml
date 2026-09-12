@@ -387,11 +387,11 @@ Item {
                                     font.pixelSize: 20
 
                                     RotationAnimation on rotation {
-                                        running: Cooling.isTurbo
+                                        running: Cooling.animDuration > 0
                                         loops: Animation.Infinite
                                         from: 0
                                         to: 360
-                                        duration: 800
+                                        duration: Math.max(300, Cooling.animDuration)
                                     }
                                 }
                             }
@@ -417,7 +417,7 @@ Item {
                                 Text {
                                     width: parent.width
                                     text: Cooling.profileName
-                                    color: Cooling.isTurbo ? Theme.alert : Theme.fg
+                                    color: Cooling.isTurbo || (Cooling.isManual && Cooling.manualSpeed >= 85) ? Theme.alert : Theme.fg
                                     font.family: Theme.fontDots
                                     font.pixelSize: 17
                                     font.weight: Font.Bold
@@ -435,7 +435,7 @@ Item {
                                 }
                             }
 
-                            // 3 mini indicator dots at bottom-right
+                            // 4 mini indicator dots at bottom-right (Quiet, Balanced, Turbo, Manual)
                             Row {
                                 anchors.bottom: parent.bottom
                                 anchors.bottomMargin: 8
@@ -460,6 +460,12 @@ Item {
                                     height: 5
                                     radius: 2.5
                                     color: Cooling.isTurbo ? Theme.alert : Theme.containerHighest
+                                }
+                                Rectangle {
+                                    width: 5
+                                    height: 5
+                                    radius: 2.5
+                                    color: Cooling.isManual ? Theme.primary : Theme.containerHighest
                                 }
                             }
                         }
