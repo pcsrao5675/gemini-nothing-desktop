@@ -323,45 +323,54 @@ Item {
                         height: SysInfo.amdGpuAvailable ? 150 : 106
 
                         Rectangle {
-                            id: recCard
+                            id: fanCard
                             anchors.left: parent.left
                             anchors.top: parent.top
                             anchors.bottom: parent.bottom
                             width: parent.width * 0.42
                             radius: Theme.shapeLg
-                            color: recMa.containsMouse ? Theme.surfaceHigh : Theme.surfaceAlt
+                            color: Cooling.isTurbo ? Qt.alpha(Theme.alert, 0.12) : fanMa.containsMouse ? Theme.surfaceHigh : Theme.surfaceAlt
+                            border.width: 1
+                            border.color: Cooling.isTurbo ? Theme.alert : Theme.outline
 
                             Behavior on color {
                                 ColorAnimation {
                                     duration: Theme.durShort
                                 }
                             }
-
-                            MouseArea {
-                                id: recMa
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                // grabando: solo detiene. libre: abre la vista de config
-                                onClicked: {
-                                    if (Recorder.recording)
-                                        Recorder.stop();
-                                    else
-                                        root.openOverlay("rec");
+                            Behavior on border.color {
+                                ColorAnimation {
+                                    duration: Theme.durShort
                                 }
                             }
 
+                            MouseArea {
+                                id: fanMa
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                onClicked: mouse => {
+                                    if (mouse.button === Qt.RightButton) {
+                                        root.openOverlay("fan");
+                                    } else {
+                                        Cooling.cycleProfile();
+                                    }
+                                }
+                            }
+
+                            // Fan circle icon with rotation animation
                             Rectangle {
-                                id: recDot
+                                id: fanRing
                                 anchors.left: parent.left
                                 anchors.leftMargin: 12
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: 30
-                                height: 30
+                                width: 34
+                                height: 34
                                 radius: height / 2
-                                color: Recorder.recording ? "transparent" : Theme.surfaceHigh
+                                color: Cooling.isTurbo ? Qt.alpha(Theme.alert, 0.2) : "transparent"
                                 border.width: 1.5
-                                border.color: Recorder.recording ? Theme.alert : Theme.outline
+                                border.color: Cooling.accent
 
                                 Behavior on border.color {
                                     ColorAnimation {
@@ -369,36 +378,35 @@ Item {
                                     }
                                 }
 
-                                Rectangle {
-                                    anchors.centerIn: parent
-                                    visible: Recorder.recording
-                                    width: 11
-                                    height: 11
-                                    radius: 2
-                                    color: Theme.alert
-                                }
-
                                 Text {
+                                    id: fanIcon
                                     anchors.centerIn: parent
-                                    visible: !Recorder.recording
-                                    text: "play_arrow"
-                                    color: Theme.fg
+                                    text: "mode_fan"
+                                    color: Cooling.accent
                                     font.family: Theme.fontIcons
-                                    font.pixelSize: 18
+                                    font.pixelSize: 20
+
+                                    RotationAnimation on rotation {
+                                        running: Cooling.isTurbo
+                                        loops: Animation.Infinite
+                                        from: 0
+                                        to: 360
+                                        duration: 800
+                                    }
                                 }
                             }
 
                             Column {
-                                anchors.left: recDot.right
+                                anchors.left: fanRing.right
                                 anchors.leftMargin: 10
                                 anchors.right: parent.right
                                 anchors.rightMargin: 8
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 0
+                                spacing: 1
 
                                 Text {
                                     width: parent.width
-                                    text: Cfg.t("GRABACIÓN")
+                                    text: Cfg.t("COOLING")
                                     color: Theme.fgDim
                                     font.family: Theme.font
                                     font.pixelSize: Theme.labelSmall
@@ -408,18 +416,56 @@ Item {
 
                                 Text {
                                     width: parent.width
-                                    text: Recorder.elapsedText
-                                    color: Recorder.recording ? Theme.fg : Theme.fgFaint
+                                    text: Cooling.profileName
+                                    color: Cooling.isTurbo ? Theme.alert : Theme.fg
                                     font.family: Theme.fontDots
-                                    font.pixelSize: 18
+                                    font.pixelSize: 17
                                     font.weight: Font.Bold
                                     elide: Text.ElideRight
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: Cooling.profileDesc
+                                    color: Cooling.accent
+                                    font.family: Theme.font
+                                    font.pixelSize: 10
+                                    font.letterSpacing: 0.4
+                                    elide: Text.ElideRight
+                                }
+                            }
+
+                            // 3 mini indicator dots at bottom-right
+                            Row {
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 8
+                                anchors.right: parent.right
+                                anchors.rightMargin: 10
+                                spacing: 4
+
+                                Rectangle {
+                                    width: 5
+                                    height: 5
+                                    radius: 2.5
+                                    color: Cooling.isQuiet ? Theme.secondary : Theme.containerHighest
+                                }
+                                Rectangle {
+                                    width: 5
+                                    height: 5
+                                    radius: 2.5
+                                    color: Cooling.isBalanced ? Theme.primary : Theme.containerHighest
+                                }
+                                Rectangle {
+                                    width: 5
+                                    height: 5
+                                    radius: 2.5
+                                    color: Cooling.isTurbo ? Theme.alert : Theme.containerHighest
                                 }
                             }
                         }
 
                         Rectangle {
-                            anchors.left: recCard.right
+                            anchors.left: fanCard.right
                             anchors.leftMargin: 8
                             anchors.right: parent.right
                             anchors.top: parent.top
@@ -523,6 +569,8 @@ Item {
                         active: root.overlay !== ""
 
                         sourceComponent: {
+                            if (root.overlay === "fan")
+                                return fanComp;
                             if (root.overlay === "rec")
                                 return recComp;
                             if (root.overlay === "wifi" || root.overlay === "bt")
@@ -540,6 +588,13 @@ Item {
                             if (root.overlay === "apps")
                                 return appsComp;
                             return null;
+                        }
+                    }
+
+                    Component {
+                        id: fanComp
+                        CoolingPanel {
+                            onClosed: root.closeOverlay()
                         }
                     }
 

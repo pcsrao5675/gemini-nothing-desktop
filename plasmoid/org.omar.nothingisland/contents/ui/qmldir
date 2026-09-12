@@ -9,3 +9,4 @@ singleton Audio 1.0 Audio.qml
 singleton Brightness 1.0 Brightness.qml
 singleton Recorder 1.0 Recorder.qml
 singleton Net 1.0 Net.qml
+singleton Cooling 1.0 Cooling.qml
