@@ -1,70 +1,54 @@
 import QtQuick
+import QtQuick.Layouts
 import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import "widgets"
 import "."
 
-WallpaperItem {
+PlasmoidItem {
     id: root
 
+    preferredRepresentation: fullRepresentation
+    Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground
+
+    compactRepresentation: null
+
+    // Sizing hints for desktop containment
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    Layout.minimumWidth: 1200
+    Layout.minimumHeight: 700
+    Layout.preferredWidth: 1920
+    Layout.preferredHeight: 1044
+    implicitWidth: 1920
+    implicitHeight: 1044
+    width: 1920
+    height: 1044
+
     // Configuration Bindings
-    readonly property color bgColor: root.configuration.backgroundColor || "#0C0D0E"
-    readonly property color accentColor: root.configuration.accentColor || "#4DA3FF"
-    readonly property bool showDotGrid: root.configuration.showDotGrid ?? true
-    readonly property real dotGridOpacity: root.configuration.dotGridOpacity ?? 0.15
+    readonly property color accentColor: Plasmoid.configuration.accentColor || "#4DA3FF"
 
     // Core Widgets
-    readonly property bool showClock: root.configuration.showClock ?? true
-    readonly property bool clock24: root.configuration.clock24 ?? true
-    readonly property bool showVitals: root.configuration.showVitals ?? true
-    readonly property bool showNotes: root.configuration.showNotes ?? true
-    property string notesContent: root.configuration.notesContent || ""
-    readonly property bool showAssistantWave: root.configuration.showAssistantWave ?? true
+    readonly property bool showClock: Plasmoid.configuration.showClock ?? true
+    readonly property bool clock24: Plasmoid.configuration.clock24 ?? true
+    readonly property bool showVitals: Plasmoid.configuration.showVitals ?? true
+    readonly property bool showNotes: Plasmoid.configuration.showNotes ?? true
+    property string notesContent: Plasmoid.configuration.notesContent || ""
+    readonly property bool showAssistantWave: Plasmoid.configuration.showAssistantWave ?? true
 
     // Expanded Modular Widgets
-    readonly property bool showQuickToggles: root.configuration.showQuickToggles ?? true
-    readonly property bool showWeatherForecast: root.configuration.showWeatherForecast ?? true
-    readonly property bool showQuickLinks: root.configuration.showQuickLinks ?? true
-    readonly property bool showQuickAsk: root.configuration.showQuickAsk ?? true
-    readonly property bool showMonthCalendar: root.configuration.showMonthCalendar ?? false
-    readonly property bool showDesktopWidgets: root.configuration.showDesktopWidgets ?? false
+    readonly property bool showQuickToggles: Plasmoid.configuration.showQuickToggles ?? true
+    readonly property bool showWeatherForecast: Plasmoid.configuration.showWeatherForecast ?? true
+    readonly property bool showQuickLinks: Plasmoid.configuration.showQuickLinks ?? true
+    readonly property bool showQuickAsk: Plasmoid.configuration.showQuickAsk ?? true
+    readonly property bool showMonthCalendar: Plasmoid.configuration.showMonthCalendar ?? false
 
     // Signature Behavior: One-Click Focus Mode
     property bool focusModeActive: false
 
-    // Canvas with Nothing OS Subtle 24px Dot Matrix Grid
-    Rectangle {
-        id: bgRect
+    fullRepresentation: Item {
+        id: container
         anchors.fill: parent
-        color: root.bgColor
-
-        Canvas {
-            id: gridCanvas
-            anchors.fill: parent
-            visible: root.showDotGrid
-            opacity: root.dotGridOpacity
-
-            onPaint: {
-                var ctx = getContext("2d");
-                ctx.clearRect(0, 0, width, height);
-                ctx.fillStyle = "#FFFFFF";
-
-                var step = 24;
-                for (var x = 12; x < width; x += step) {
-                    for (var y = 12; y < height; y += step) {
-                        ctx.beginPath();
-                        ctx.arc(x, y, 1, 0, 2 * Math.PI);
-                        ctx.fill();
-                    }
-                }
-            }
-        }
-    }
-
-    Item {
-        id: widgetsOverlay
-        anchors.fill: parent
-        visible: root.showDesktopWidgets
 
         // ── 1. Glyph-Style Ambient Border Light (Screen Edge) ──
         GlyphBorderLight {
@@ -120,7 +104,7 @@ WallpaperItem {
                     accentColor: root.accentColor
                     notesText: root.notesContent
                     onNotesUpdated: (newTxt) => {
-                        root.configuration.notesContent = newTxt;
+                        Plasmoid.configuration.notesContent = newTxt;
                     }
                 }
             }
@@ -136,6 +120,7 @@ WallpaperItem {
                 ClockWidget {
                     id: clockWidget
                     width: parent.width
+                    height: implicitHeight
                     visible: root.showClock
                     clock24: root.clock24
                     accentColor: root.accentColor
@@ -145,6 +130,7 @@ WallpaperItem {
                 AiPillsWidget {
                     id: aiPills
                     anchors.horizontalCenter: parent.horizontalCenter
+                    height: implicitHeight
                     accentColor: root.accentColor
                 }
 
@@ -194,6 +180,7 @@ WallpaperItem {
                 WeatherForecastWidget {
                     id: weatherChip
                     anchors.horizontalCenter: parent.horizontalCenter
+                    height: implicitHeight
                     visible: root.showWeatherForecast && !root.focusModeActive
                     opacity: visible ? 1.0 : 0.0
                     accentColor: root.accentColor

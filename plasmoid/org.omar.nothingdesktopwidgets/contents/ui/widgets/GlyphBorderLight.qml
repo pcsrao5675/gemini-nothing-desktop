@@ -17,16 +17,22 @@ Item {
     property color currentColor: root.accentColor
     property real currentOpacity: 0.0
 
-    // Power management for laptop charging detection
+    // Power management for laptop charging / AC detection
     P5Support.DataSource {
         id: pmSource
         engine: "powermanagement"
-        connectedSources: ["Battery"]
+        connectedSources: ["Battery", "AC Adapter"]
     }
 
     readonly property var batData: pmSource.data["Battery"] ?? ({})
-    onBatDataChanged: {
-        root.isCharging = (batData["State"] ?? "") === "Charging";
+    readonly property var acData: pmSource.data["AC Adapter"] ?? ({})
+    onBatDataChanged: updateChargingState()
+    onAcDataChanged: updateChargingState()
+
+    function updateChargingState() {
+        const state = (batData["State"] ?? "").toString().toLowerCase();
+        const pluggedIn = (batData["Plugged in"] ?? false) === true || (acData["Plugged in"] ?? false) === true;
+        root.isCharging = state === "charging" || (pluggedIn && state !== "discharging");
     }
 
     // System notifications listener

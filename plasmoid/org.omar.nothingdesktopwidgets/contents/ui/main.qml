@@ -120,6 +120,7 @@ PlasmoidItem {
                 ClockWidget {
                     id: clockWidget
                     width: parent.width
+                    height: implicitHeight
                     visible: root.showClock
                     clock24: root.clock24
                     accentColor: root.accentColor
@@ -129,6 +130,7 @@ PlasmoidItem {
                 AiPillsWidget {
                     id: aiPills
                     anchors.horizontalCenter: parent.horizontalCenter
+                    height: implicitHeight
                     accentColor: root.accentColor
                 }
 
@@ -178,6 +180,7 @@ PlasmoidItem {
                 WeatherForecastWidget {
                     id: weatherChip
                     anchors.horizontalCenter: parent.horizontalCenter
+                    height: implicitHeight
                     visible: root.showWeatherForecast && !root.focusModeActive
                     opacity: visible ? 1.0 : 0.0
                     accentColor: root.accentColor

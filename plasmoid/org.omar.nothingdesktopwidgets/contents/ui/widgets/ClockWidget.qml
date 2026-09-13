@@ -63,8 +63,8 @@ Item {
             // Giant Dot-Matrix Time with Dot-Dissolve Minute Tick
             DotDissolveTransition {
                 id: clockTransition
-                width: timeText.implicitWidth
-                height: timeText.implicitHeight
+                width: 320
+                height: 80
                 anchors.horizontalCenter: parent.horizontalCenter
                 dotColor: root.accentColor
                 duration: 400
