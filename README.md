@@ -20,6 +20,7 @@ The suite coordinates five modular subsystems across user space, compositor D-Bu
 graph TD
     subgraph "KDE Plasma 6 Desktop"
         TopBar["Nothing OS Island Plasmoid<br/>(org.omar.nothingisland)"]
+        Wallpaper["Nothing OS Desktop Wallpaper<br/>(org.omar.nothingdesktop)"]
         KWin["KWin 6 Compositor<br/>(Wayland Scripting & Rules)"]
         Shortcuts["KDE Global Shortcuts<br/>(HP Omen Launch(2) / Meta+Space)"]
     end
@@ -96,12 +97,24 @@ graph TD
 ## Subsystem Deep Dive
 
 ### 1. Plasmoid: Nothing OS Island (`plasmoid/org.omar.nothingisland`)
-A complete 47-file declarative desktop applet for KDE Plasma 6:
+A complete declarative desktop topbar applet for KDE Plasma 6:
 - **Electric Blue Wave Engine**: When the Gemini Assistant is active, an integrated HTML5/QML Canvas renders a high-performance sinusoidal wave (`#4DA3FF`) oscillating at 40 FPS (~25ms interval) with subtle opacity gradients.
 - **Dynamic Status Polling**: Continuously queries `http://127.0.0.1:8765/active` every 300ms using asynchronous `XMLHttpRequest` without stalling compositor render threads.
 - **Pill Launch Trigger**: Clicking the Nothing OS pill button queries `gemini-toggle.sh` via dynamic executable resolution (`StandardPaths.findExecutable` with fallback to `$HOME/.local/bin/gemini-toggle.sh`), stripping any `file://` protocol wrappers before invoking `Exec.run`.
 
-### 2. Brave Extension (`extension/`)
+### 2. Wallpaper Plugin: Nothing OS Desktop (`wallpaper/org.omar.nothingdesktop`)
+A native KDE Plasma 6 Wallpaper plugin (`Plasma/Wallpaper`) hosting live desktop widgets behind desktop icons:
+- **Nothing OS Visual Language**: Dark canvas (`#050505`) with configurable dot-matrix grid pitch, Electric Blue accents, and NDot-47 typography.
+- **Independent Modular Widgets**:
+  - *Dot-Matrix Clock & Date*: Large time display with animated pulsing seconds indicator.
+  - *System Vitals Card*: Real-time CPU load, memory utilization, battery status, and multi-vendor GPU temperature detection.
+  - *MPRIS Media Card*: Live album art display, metadata (track, artist), and interactive D-Bus playback controls.
+  - *Agenda & Calendar*: Chronological event overview with local `.ics` file support.
+  - *Quick Notes Scratchpad*: Editable on-screen notes widget with persistent auto-saving.
+  - *Assistant Wave Widget*: 40 FPS ambient sinusoidal wave mirroring assistant activity on the desktop surface.
+- **Native Configuration Surface**: Full Qt/Kirigami settings interface accessible via Plasma's "Desktop and Wallpaper" dialog for toggling widgets, positioning them across 7 layout anchors, and tweaking accent colors.
+
+### 3. Brave Extension (`extension/`)
 Manifest V3 browser extension tailored specifically for `https://gemini.google.com/*`:
 - **Screen Attacher Action Pill**: Injects a floating `#gemini-screen-pill-btn` into the Gemini web client's bottom toolbar.
 - **3-Tier Fallback Image Injection Pipeline**:

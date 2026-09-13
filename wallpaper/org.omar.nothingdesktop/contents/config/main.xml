@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+                          http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+
+  <kcfgfile name=""/>
+
+  <group name="General">
+    <!-- Visual Appearance -->
+    <entry name="backgroundColor" type="Color">
+      <default>#050505</default>
+    </entry>
+    <entry name="accentColor" type="Color">
+      <default>#4DA3FF</default>
+    </entry>
+    <entry name="showDotGrid" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="dotGridOpacity" type="Double">
+      <default>0.15</default>
+    </entry>
+
+    <!-- Clock Widget -->
+    <entry name="showClock" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="clock24" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="clockPosition" type="String">
+      <default>TopCenter</default>
+    </entry>
+
+    <!-- System Vitals Widget -->
+    <entry name="showVitals" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="vitalsPosition" type="String">
+      <default>TopRight</default>
+    </entry>
+
+    <!-- Media Player Widget -->
+    <entry name="showMedia" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="mediaPosition" type="String">
+      <default>BottomLeft</default>
+    </entry>
+
+    <!-- Agenda / Calendar Widget -->
+    <entry name="showAgenda" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="agendaPosition" type="String">
+      <default>TopLeft</default>
+    </entry>
+    <entry name="icsFilePath" type="String">
+      <default></default>
+    </entry>
+
+    <!-- Quick Notes Widget -->
+    <entry name="showNotes" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="notesPosition" type="String">
+      <default>BottomRight</default>
+    </entry>
+    <entry name="notesContent" type="String">
+      <default>// NOTHING QUICK NOTES
+- Tap to edit notes
+- Stored persistently</default>
+    </entry>
+
+    <!-- Assistant Wave Indicator -->
+    <entry name="showAssistantWave" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="wavePosition" type="String">
+      <default>BottomCenter</default>
+    </entry>
+  </group>
+
+</kcfg>

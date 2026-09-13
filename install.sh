@@ -14,6 +14,7 @@ XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$TARGET_HOME/.config}"
 BIN_DIR="${XDG_BIN_HOME:-$TARGET_HOME/.local/bin}"
 
 PLASMOID_DEST="$XDG_DATA_HOME/plasma/plasmoids/org.omar.nothingisland"
+WALLPAPER_DEST="$XDG_DATA_HOME/plasma/wallpapers/org.omar.nothingdesktop"
 ASSISTANT_DEST="$XDG_DATA_HOME/gemini-assistant"
 EXTENSION_DEST="$ASSISTANT_DEST/extension"
 TOGGLE_DEST="$BIN_DIR/gemini-toggle.sh"
@@ -37,6 +38,7 @@ Options:
 
 Target Destinations:
   - Plasmoid:         $XDG_DATA_HOME/plasma/plasmoids/org.omar.nothingisland
+  - Wallpaper Plugin: $XDG_DATA_HOME/plasma/wallpapers/org.omar.nothingdesktop
   - Assistant Core:   $XDG_DATA_HOME/gemini-assistant/
   - Toggle Launcher:  $HOME/.local/bin/gemini-toggle.sh
   - Desktop Entry:    $XDG_DATA_HOME/applications/gemini-overlay.desktop
@@ -150,6 +152,11 @@ mkdir -p "$(dirname "$KWIN_RULES_FILE")"
 # 2. Deploy Plasmoid
 echo "-> Deploying Nothing OS Island plasmoid to $PLASMOID_DEST..."
 cp -r "$SCRIPT_DIR/plasmoid/org.omar.nothingisland/"* "$PLASMOID_DEST/"
+
+# 2b. Deploy Wallpaper Plugin
+echo "-> Deploying Nothing OS Wallpaper plugin to $WALLPAPER_DEST..."
+mkdir -p "$WALLPAPER_DEST"
+cp -r "$SCRIPT_DIR/wallpaper/org.omar.nothingdesktop/"* "$WALLPAPER_DEST/"
 
 # 3. Deploy Extension
 echo "-> Deploying Brave Extension to $EXTENSION_DEST..."

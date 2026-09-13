@@ -32,7 +32,7 @@ run_tier1_tests() {
         record_fail "T1-PLASM-02" "Plasmoid metadata file missing"
     fi
 
-    assert_file_count "T1-PLASM-03" "$plasmoid_dir" 47 \
+    assert_file_count "T1-PLASM-03" "$plasmoid_dir" 49 \
         "Plasmoid directory contains complete 47-file distribution tree"
 
     local fonts_ok=1

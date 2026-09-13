@@ -22,7 +22,7 @@ run_tier4_tests() {
     # Plasmoid
     local plasmoid_count
     plasmoid_count=$(find "$REPO_ROOT/plasmoid/org.omar.nothingisland" -type f -not -path "*/__pycache__*" -not -name "*.pyc" 2>/dev/null | wc -l)
-    if [[ "$plasmoid_count" -ne 47 ]]; then
+    if [[ "$plasmoid_count" -ne 49 ]]; then
         manifest_ok=0
         missing_items+=("Plasmoid file count ($plasmoid_count != 47)")
     fi

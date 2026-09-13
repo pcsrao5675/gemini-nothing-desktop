@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Omar & Gemini Team"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Nothing OS style desktop wallpaper with customizable live widgets: dot-matrix clock, system vitals, MPRIS player, agenda, and quick notes.",
+        "Icon": "preferences-desktop-wallpaper",
+        "Id": "org.omar.nothingdesktop",
+        "License": "MIT",
+        "Name": "Nothing OS Desktop Widgets",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

@@ -12,6 +12,7 @@ XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$TARGET_HOME/.config}"
 BIN_DIR="${XDG_BIN_HOME:-$TARGET_HOME/.local/bin}"
 
 PLASMOID_DEST="$XDG_DATA_HOME/plasma/plasmoids/org.omar.nothingisland"
+WALLPAPER_DEST="$XDG_DATA_HOME/plasma/wallpapers/org.omar.nothingdesktop"
 ASSISTANT_DEST="$XDG_DATA_HOME/gemini-assistant"
 TOGGLE_DEST="$BIN_DIR/gemini-toggle.sh"
 DESKTOP_DEST="$XDG_DATA_HOME/applications/gemini-overlay.desktop"
@@ -32,6 +33,7 @@ Options:
 
 Target Removal Items:
   - Plasma Applet:    $XDG_DATA_HOME/plasma/plasmoids/org.omar.nothingisland (nothingisland)
+  - Wallpaper Plugin: $XDG_DATA_HOME/plasma/wallpapers/org.omar.nothingdesktop (nothingdesktop)
   - Assistant Core:   $XDG_DATA_HOME/gemini-assistant/ (gemini-assistant)
   - Toggle Launcher:  $HOME/.local/bin/gemini-toggle.sh (gemini-toggle)
   - Desktop Entry:    $XDG_DATA_HOME/applications/gemini-overlay.desktop
@@ -99,6 +101,11 @@ echo "-> Removing installed files..."
 if [[ -d "$PLASMOID_DEST" ]]; then
     rm -rf "$PLASMOID_DEST"
     echo "   Removed: $PLASMOID_DEST (nothingisland)"
+fi
+
+if [[ -d "$WALLPAPER_DEST" ]]; then
+    rm -rf "$WALLPAPER_DEST"
+    echo "   Removed: $WALLPAPER_DEST (nothingdesktop)"
 fi
 
 if [[ -d "$ASSISTANT_DEST" ]]; then
