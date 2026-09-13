@@ -10,11 +10,22 @@ import os
 import dbus
 import dbus.service
 import dbus.mainloop.glib
+
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 from gi.repository import GLib, Gdk
 
-from .config import NotificationConfig
-from .history import NotificationHistory
-from .renderer import NotificationWindow
+# Ensure current directory is in sys.path when executed directly
+if __package__ is None or __package__ == "":
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from config import NotificationConfig
+    from history import NotificationHistory
+    from renderer import NotificationWindow
+else:
+    from .config import NotificationConfig
+    from .history import NotificationHistory
+    from .renderer import NotificationWindow
 
 INTERFACE = "org.freedesktop.Notifications"
 PATH = "/org/freedesktop/Notifications"
