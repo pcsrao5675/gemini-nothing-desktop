@@ -15,6 +15,7 @@ BIN_DIR="${XDG_BIN_HOME:-$TARGET_HOME/.local/bin}"
 
 PLASMOID_DEST="$XDG_DATA_HOME/plasma/plasmoids/org.omar.nothingisland"
 WALLPAPER_DEST="$XDG_DATA_HOME/plasma/wallpapers/org.omar.nothingdesktop"
+DESKTOP_WIDGETS_DEST="$XDG_DATA_HOME/plasma/plasmoids/org.omar.nothingdesktopwidgets"
 ASSISTANT_DEST="$XDG_DATA_HOME/gemini-assistant"
 EXTENSION_DEST="$ASSISTANT_DEST/extension"
 TOGGLE_DEST="$BIN_DIR/gemini-toggle.sh"
@@ -157,6 +158,11 @@ cp -r "$SCRIPT_DIR/plasmoid/org.omar.nothingisland/"* "$PLASMOID_DEST/"
 echo "-> Deploying Nothing OS Wallpaper plugin to $WALLPAPER_DEST..."
 mkdir -p "$WALLPAPER_DEST"
 cp -r "$SCRIPT_DIR/wallpaper/org.omar.nothingdesktop/"* "$WALLPAPER_DEST/"
+
+# 2c. Deploy Desktop Widgets Applet
+echo "-> Deploying Nothing OS Desktop Widgets applet to $DESKTOP_WIDGETS_DEST..."
+mkdir -p "$DESKTOP_WIDGETS_DEST"
+cp -r "$SCRIPT_DIR/plasmoid/org.omar.nothingdesktopwidgets/"* "$DESKTOP_WIDGETS_DEST/"
 
 # 3. Deploy Extension
 echo "-> Deploying Brave Extension to $EXTENSION_DEST..."

@@ -13,6 +13,7 @@ BIN_DIR="${XDG_BIN_HOME:-$TARGET_HOME/.local/bin}"
 
 PLASMOID_DEST="$XDG_DATA_HOME/plasma/plasmoids/org.omar.nothingisland"
 WALLPAPER_DEST="$XDG_DATA_HOME/plasma/wallpapers/org.omar.nothingdesktop"
+DESKTOP_WIDGETS_DEST="$XDG_DATA_HOME/plasma/plasmoids/org.omar.nothingdesktopwidgets"
 ASSISTANT_DEST="$XDG_DATA_HOME/gemini-assistant"
 TOGGLE_DEST="$BIN_DIR/gemini-toggle.sh"
 DESKTOP_DEST="$XDG_DATA_HOME/applications/gemini-overlay.desktop"
@@ -108,6 +109,11 @@ fi
 if [[ -d "$WALLPAPER_DEST" ]]; then
     rm -rf "$WALLPAPER_DEST"
     echo "   Removed: $WALLPAPER_DEST (nothingdesktop)"
+fi
+
+if [[ -d "$DESKTOP_WIDGETS_DEST" ]]; then
+    rm -rf "$DESKTOP_WIDGETS_DEST"
+    echo "   Removed: $DESKTOP_WIDGETS_DEST (nothingdesktopwidgets)"
 fi
 
 if [[ -d "$ASSISTANT_DEST" ]]; then

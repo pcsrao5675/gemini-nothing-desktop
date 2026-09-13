@@ -36,6 +36,7 @@ WallpaperItem {
     readonly property bool showNetDisk: root.configuration.showNetDisk ?? false
     readonly property bool showClipboard: root.configuration.showClipboard ?? false
     readonly property bool showAmbientTile: root.configuration.showAmbientTile ?? false
+    readonly property bool showDesktopWidgets: root.configuration.showDesktopWidgets ?? false
 
     // Canvas with Nothing OS Subtle 24px Dot Matrix Grid
     Rectangle {
@@ -66,8 +67,13 @@ WallpaperItem {
         }
     }
 
-    // Top System Beacon Strip
-    Rectangle {
+    Item {
+        id: widgetsOverlay
+        anchors.fill: parent
+        visible: root.showDesktopWidgets
+
+        // Top System Beacon Strip
+        Rectangle {
         id: beaconStrip
         anchors.top: parent.top
         anchors.topMargin: 12
@@ -417,4 +423,5 @@ WallpaperItem {
             anchors.bottom: parent.bottom
         }
     }
+}
 }

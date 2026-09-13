@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Omar & Gemini Team"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Nothing OS interactive desktop widgets: dot-matrix clock, telemetry, MPRIS player, agenda, quick notes, focus pomodoro, quick toggles, and assistant bar.",
+        "Icon": "preferences-desktop-wallpaper",
+        "Id": "org.omar.nothingdesktopwidgets",
+        "License": "MIT",
+        "Name": "Nothing OS Desktop Widgets",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

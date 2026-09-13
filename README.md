@@ -110,10 +110,12 @@ graph TD
 
 ## Subsystem Deep Dive
 
-### 1. Wallpaper Plugin: Nothing OS Desktop (`wallpaper/org.omar.nothingdesktop`)
-A native KDE Plasma 6 Wallpaper plugin (`Plasma/Wallpaper`) hosting live, interactive desktop widgets behind desktop icons without overlay windows:
-- **Nothing OS Visual Language**: Dark canvas (`#050505`) with 24px dot-matrix grid pitch, Electric Blue (`#4DA3FF`) and Nothing Red (`#D71921`) accents, Space Grotesk typography, and NDot-47 digital readouts.
-- **Full Widget Interactivity**:
+### 1. Wallpaper Plugin & Desktop Widgets Layer
+- **Wallpaper Plugin (`wallpaper/org.omar.nothingdesktop`)**: Native KDE Plasma 6 Wallpaper plugin (`Plasma/Wallpaper`) providing the authentic Nothing OS dark background (`#050505`), 24px subtle dot-matrix grid pitch, and standard KDE Desktop & Wallpaper configuration UI.
+- **Desktop Widgets Applet (`plasmoid/org.omar.nothingdesktopwidgets`)**: Native KDE Plasma 6 Desktop Applet (`Plasma/Applet`) placed full-screen across the desktop containment (`org.kde.desktopcontainment`) with zero background (`PlasmaCore.Types.NoBackground`), delivering 100% complete mouse pointer interactivity, keyboard text editing, button controls, and sparkline animations on Wayland.
+- **Automated Placement Tool (`bin/install-desktop-widgets.sh`)**: Automatically synchronizes both components, registers the desktop applet with KDE's containment scripting engine, and ensures full-screen pixel geometry.
+
+- **Full Widget Interactivity & Screen Coverage**:
   - *Agenda & Schedule*: Interactive event items with hover animations, in-place details expansion, check/dismiss action buttons, and launch calendar (`merkuro-calendar`, `korganizer`).
   - *Quick Notes*: Multi-line editable notepad with dual-layer persistent auto-saving (`plasmoid.configuration.notesContent` and `~/.local/share/nothing-desktop/quicknotes.txt`).
   - *System Vitals*: Real-time CPU, RAM, Battery, and multi-vendor GPU telemetry. Clicks expand live 60-second canvas sparkline graphs or launch KDE System Monitor; Battery launches KDE Power Management.
@@ -128,9 +130,9 @@ A native KDE Plasma 6 Wallpaper plugin (`Plasma/Wallpaper`) hosting live, intera
   - *Habit & Goal Tracker*: 7-day persistent completion dots for weekly goals.
   - *Gemini Quick-Ask Bar*: Desktop search/prompt bar that triggers the floating assistant with the entered query.
   - *Month Calendar View*: Dot-matrix calendar grid with current day highlight.
-  - *Network & Disk Activity*: Live throughput telemetry (down/up KB/s, disk read/write) with real-time canvas sparkline.
-  - *Clipboard History Strip*: Recent snippets with one-click copy to clipboard.
-  - *Ambient Matrix Tile*: Subtle procedural sinusoidal wave art.
+  - *Network & Disk I/O*: Real-time network throughput and disk activity sparklines.
+  - *Clipboard History*: Quick-copy snippet tiles with `wl-copy` clipboard integration.
+  - *Sinusoidal Ambient Tile*: Procedural Nothing OS wave artwork.
 - **Native Configuration Surface**: Qt/Kirigami settings panel in Plasma's "Desktop and Wallpaper" dialog allowing individual toggling of every widget and placement configuration.
 
 ### 2. Top Bar Applet: Nothing OS Island (`plasmoid/org.omar.nothingisland`)
