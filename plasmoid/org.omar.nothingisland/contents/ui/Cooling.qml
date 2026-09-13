@@ -4,32 +4,32 @@ import QtQuick
 import org.kde.plasma.plasma5support as P5Support
 import "."
 
-// Control de refrigeración, perfiles automáticos y control manual de ventiladores
+// Cooling and HP Victus fan speed controller
 QtObject {
     id: root
 
     // "balanced" | "performance" | "low-power"
     property string profile: "balanced"
 
-    // Modo manual de velocidad
+    // Manual speed control (0 - 100%)
     property bool isManual: false
-    property int manualSpeed: 80 // 0 a 100%
+    property int manualSpeed: 80
 
     readonly property string profileName: {
         if (isManual) {
-            if (manualSpeed >= 95) return Cfg.t("MAX 100%");
+            if (manualSpeed >= 95) return "100% MAX";
             return manualSpeed + "%";
         }
-        if (profile === "performance") return Cfg.t("TURBO");
-        if (profile === "low-power")   return Cfg.t("QUIET");
-        return Cfg.t("BALANCED");
+        if (profile === "performance") return "TURBO";
+        if (profile === "low-power")   return "QUIET";
+        return "BALANCED";
     }
 
     readonly property string profileDesc: {
-        if (isManual) return Cfg.t("MANUAL SPEED");
-        if (profile === "performance") return Cfg.t("MAX FANS");
-        if (profile === "low-power")   return Cfg.t("SILENT");
-        return Cfg.t("AUTO SPEED");
+        if (isManual) return "MANUAL";
+        if (profile === "performance") return "MAX FANS";
+        if (profile === "low-power")   return "SILENT";
+        return "AUTO";
     }
 
     readonly property bool isTurbo: !isManual && profile === "performance"
@@ -47,14 +47,14 @@ QtObject {
         return Theme.primary;
     }
 
-    // Velocidad de animación del icono según el modo (ms por rotación)
+    // Animation duration for rotating fan icon (ms per 360 deg)
     readonly property int animDuration: {
         if (isManual) {
-            if (manualSpeed <= 10) return 0;
-            return Math.max(300, Math.round(1600 - (manualSpeed * 13)));
+            if (manualSpeed <= 5) return 0;
+            return Math.max(250, Math.round(1500 - (manualSpeed * 12.5)));
         }
-        if (isTurbo) return 700;
-        if (isBalanced) return 1400;
+        if (isTurbo) return 650;
+        if (isBalanced) return 1300;
         return 2200;
     }
 
@@ -75,7 +75,6 @@ QtObject {
                         root.profile = prof;
                     }
                     if (pwmEnable === "0" && !root.isManual) {
-                        // Max hardware fan boost active
                         root.isManual = true;
                         root.manualSpeed = 100;
                     }
@@ -93,8 +92,7 @@ QtObject {
         root.isManual = false;
         root.profile = mode;
         const ppTarget = (mode === "low-power") ? "power-saver" : mode;
-        // Restore pwm1_enable = 2 (auto BIOS control) and set ACPI profile
-        const cmd = `p=$(find /sys/devices/platform/hp-wmi/ -name "pwm1_enable" 2>/dev/null | head -1); [ -n "$p" ] && echo 2 > "$p" 2>/dev/null; if command -v powerprofilesctl >/dev/null 2>&1; then powerprofilesctl set ${ppTarget} 2>/dev/null || true; fi; echo ${mode} > /sys/firmware/acpi/platform_profile 2>/dev/null || true`;
+        const cmd = "p=$(find /sys/devices/platform/hp-wmi/ -name 'pwm1_enable' 2>/dev/null | head -1); [ -n \"$p\" ] && { echo 2 > \"$p\" 2>/dev/null || pkexec /bin/sh -c \"echo 2 > '$p'\"; }; powerprofilesctl set " + ppTarget + " 2>/dev/null || true; echo " + mode + " > /sys/firmware/acpi/platform_profile 2>/dev/null || true";
         Exec.run(cmd);
         verifyTimer.restart();
     }
@@ -105,15 +103,12 @@ QtObject {
         const pwmVal = Math.round(root.manualSpeed * 2.55);
 
         let cmd = "";
-        if (root.manualSpeed >= 90) {
-            // HP Hardware Max Boost: pwm1_enable = 0 forces full fan RPM
-            cmd = `p=$(find /sys/devices/platform/hp-wmi/ -name "pwm1_enable" 2>/dev/null | head -1); [ -n "$p" ] && echo 0 > "$p" 2>/dev/null; p2=$(find /sys/devices/platform/hp-wmi/ -name "pwm1" 2>/dev/null | head -1); [ -n "$p2" ] && echo 255 > "$p2" 2>/dev/null; powerprofilesctl set performance 2>/dev/null || true`;
-        } else if (root.manualSpeed <= 25) {
-            // Low speed: power-saver + low PWM
-            cmd = `p=$(find /sys/devices/platform/hp-wmi/ -name "pwm1_enable" 2>/dev/null | head -1); [ -n "$p" ] && echo 1 > "$p" 2>/dev/null; p2=$(find /sys/devices/platform/hp-wmi/ -name "pwm1" 2>/dev/null | head -1); [ -n "$p2" ] && echo ${pwmVal} > "$p2" 2>/dev/null; powerprofilesctl set power-saver 2>/dev/null || true`;
+        if (root.manualSpeed >= 95) {
+            // HP Hardware Max Boost: pwm1_enable = 0 forces full fan RPM blast
+            cmd = "p=$(find /sys/devices/platform/hp-wmi/ -name 'pwm1_enable' 2>/dev/null | head -1); [ -n \"$p\" ] && { echo 0 > \"$p\" 2>/dev/null || pkexec /bin/sh -c \"echo 0 > '$p' && echo 255 > '$(dirname $p)/pwm1'\"; echo 255 > \"$(dirname $p)/pwm1\" 2>/dev/null; }; powerprofilesctl set performance 2>/dev/null || true";
         } else {
-            // Balanced / Custom PWM
-            cmd = `p=$(find /sys/devices/platform/hp-wmi/ -name "pwm1_enable" 2>/dev/null | head -1); [ -n "$p" ] && echo 1 > "$p" 2>/dev/null; p2=$(find /sys/devices/platform/hp-wmi/ -name "pwm1" 2>/dev/null | head -1); [ -n "$p2" ] && echo ${pwmVal} > "$p2" 2>/dev/null; powerprofilesctl set balanced 2>/dev/null || true`;
+            const ppTarget = root.manualSpeed <= 30 ? "power-saver" : (root.manualSpeed >= 70 ? "performance" : "balanced");
+            cmd = "p=$(find /sys/devices/platform/hp-wmi/ -name 'pwm1_enable' 2>/dev/null | head -1); [ -n \"$p\" ] && { echo 1 > \"$p\" 2>/dev/null || pkexec /bin/sh -c \"echo 1 > '$p' && echo " + pwmVal + " > '$(dirname $p)/pwm1'\"; echo " + pwmVal + " > \"$(dirname $p)/pwm1\" 2>/dev/null; }; powerprofilesctl set " + ppTarget + " 2>/dev/null || true";
         }
         Exec.run(cmd);
         verifyTimer.restart();
@@ -126,9 +121,8 @@ QtObject {
             else if (root.profile === "performance")
                 root.setProfile("low-power");
             else
-                root.setManualSpeed(80); // Switch to manual preset
+                root.setManualSpeed(100);
         } else {
-            // From manual, go back to balanced auto
             root.setProfile("balanced");
         }
     }

@@ -406,7 +406,7 @@ Item {
 
                                 Text {
                                     width: parent.width
-                                    text: Cfg.t("COOLING")
+                                    text: "COOLING"
                                     color: Theme.fgDim
                                     font.family: Theme.font
                                     font.pixelSize: Theme.labelSmall

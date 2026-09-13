@@ -1,7 +1,7 @@
 import QtQuick
 import "."
 
-// Panel de control de refrigeración: perfiles automáticos y control manual de velocidad
+// Cooling and fan speed control panel
 Item {
     id: popup
 
@@ -9,7 +9,7 @@ Item {
 
     implicitHeight: col.implicitHeight + 20
 
-    // Tab activo: "auto" o "manual"
+    // Active tab: "auto" or "manual"
     property string activeTab: Cooling.isManual ? "manual" : "auto"
 
     Column {
@@ -19,7 +19,7 @@ Item {
         anchors.top: parent.top
         spacing: 12
 
-        // ── encabezado ──
+        // ── Header ──
         Item {
             width: parent.width
             height: 26
@@ -27,7 +27,7 @@ Item {
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                text: Cfg.t("CONTROL DE VENTILACIÓN")
+                text: "COOLING & FAN SPEED"
                 color: Theme.fgFaint
                 font.family: Theme.font
                 font.pixelSize: Theme.labelSmall
@@ -62,7 +62,7 @@ Item {
             }
         }
 
-        // ── selector de pestaña: AUTO vs MANUAL ──
+        // ── Mode Switcher Tabs: AUTO vs MANUAL ──
         Rectangle {
             width: parent.width
             height: 38
@@ -76,7 +76,7 @@ Item {
                 anchors.margins: 3
                 spacing: 4
 
-                // Pestaña Auto
+                // Auto Tab
                 Rectangle {
                     width: (parent.width - 4) / 2
                     height: parent.height
@@ -97,7 +97,7 @@ Item {
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: Cfg.t("PERFILES AUTO")
+                            text: "AUTO PROFILES"
                             color: popup.activeTab === "auto" ? Theme.invertedFg : Theme.fg
                             font.family: Theme.font
                             font.pixelSize: Theme.labelSmall
@@ -119,7 +119,7 @@ Item {
                     }
                 }
 
-                // Pestaña Manual
+                // Manual Tab
                 Rectangle {
                     width: (parent.width - 4) / 2
                     height: parent.height
@@ -140,7 +140,7 @@ Item {
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: Cfg.t("VELOCIDAD MANUAL")
+                            text: "MANUAL SPEED"
                             color: popup.activeTab === "manual" ? Theme.invertedFg : Theme.fg
                             font.family: Theme.font
                             font.pixelSize: Theme.labelSmall
@@ -157,7 +157,7 @@ Item {
                         onClicked: {
                             popup.activeTab = "manual";
                             if (!Cooling.isManual)
-                                Cooling.setManualSpeed(80);
+                                Cooling.setManualSpeed(100);
                         }
                     }
                 }
@@ -165,14 +165,14 @@ Item {
         }
 
         // ══════════════════════════════════════════════════════════
-        // VISTA MANUAL: Slider + Presets
+        // MANUAL SPEED VIEW: Simple gauge + Slider + Presets
         // ══════════════════════════════════════════════════════════
         Column {
             width: parent.width
             spacing: 12
             visible: popup.activeTab === "manual"
 
-            // Tarjeta de estado de ventilador manual
+            // Fan Speed Gauge
             Rectangle {
                 width: parent.width
                 height: 70
@@ -205,7 +205,7 @@ Item {
                             loops: Animation.Infinite
                             from: 0
                             to: 360
-                            duration: Math.max(300, Cooling.animDuration)
+                            duration: Math.max(250, Cooling.animDuration)
                         }
                     }
                 }
@@ -217,7 +217,7 @@ Item {
                     spacing: 2
 
                     Text {
-                        text: Cooling.manualSpeed >= 95 ? "100% MAX BLAST" : Cooling.manualSpeed + "% SPEED"
+                        text: Cooling.manualSpeed >= 95 ? "100% MAX SPEED" : Cooling.manualSpeed + "% SPEED"
                         color: Cooling.manualSpeed >= 85 ? Theme.alert : Theme.fg
                         font.family: Theme.fontDots
                         font.pixelSize: 20
@@ -225,17 +225,18 @@ Item {
                     }
 
                     Text {
-                        text: Cooling.manualSpeed >= 90 ? Cfg.t("TURBO HARDWARE FAN BOOST ACTIVADO")
-                            : Cooling.manualSpeed <= 30 ? Cfg.t("MODO SILENCIOSO BAJA VELOCIDAD")
-                            : Cfg.t("CONTROL MANUAL PERSONALIZADO")
+                        text: Cooling.manualSpeed >= 95 ? "FULL HARDWARE FAN BLAST"
+                            : Cooling.manualSpeed <= 30 ? "QUIET LOW NOISE"
+                            : "CUSTOM SPEED"
                         color: Cooling.accent
                         font.family: Theme.font
                         font.pixelSize: Theme.labelSmall
+                        font.letterSpacing: 0.5
                     }
                 }
             }
 
-            // ── Slider interactivo ──
+            // ── Interactive Speed Slider ──
             Item {
                 width: parent.width
                 height: 38
@@ -261,7 +262,7 @@ Item {
                         Behavior on color { ColorAnimation { duration: Theme.durShort } }
                     }
 
-                    // Botón arrastrable (Thumb)
+                    // Draggable Slider Thumb
                     Rectangle {
                         id: sliderThumb
                         x: Math.max(0, Math.min(trackBar.width - width, (trackBar.width * (Cooling.manualSpeed / 100)) - (width / 2)))
@@ -298,7 +299,7 @@ Item {
                 }
             }
 
-            // ── Botones de ajuste rápido (Presets) ──
+            // ── Quick Presets ──
             Row {
                 width: parent.width
                 spacing: 6
@@ -337,15 +338,15 @@ Item {
                     }
                 }
 
-                QuickPresetBtn { speedValue: 25; label: "25% SILENT" }
-                QuickPresetBtn { speedValue: 50; label: "50% MED" }
-                QuickPresetBtn { speedValue: 75; label: "75% HIGH" }
+                QuickPresetBtn { speedValue: 25; label: "25%" }
+                QuickPresetBtn { speedValue: 50; label: "50%" }
+                QuickPresetBtn { speedValue: 75; label: "75%" }
                 QuickPresetBtn { speedValue: 100; label: "100% MAX" }
             }
         }
 
         // ══════════════════════════════════════════════════════════
-        // VISTA AUTO: 3 Perfiles HP
+        // AUTO PROFILES VIEW: 3 HP Profiles
         // ══════════════════════════════════════════════════════════
         Column {
             width: parent.width
@@ -405,7 +406,6 @@ Item {
                     }
                 }
 
-                // indicador de selección
                 Rectangle {
                     anchors.right: parent.right
                     anchors.rightMargin: 14
@@ -441,30 +441,30 @@ Item {
 
             ProfileCard {
                 targetProfile: "performance"
-                title: Cfg.t("TURBO / RENDIMIENTO")
-                desc: Cfg.t("Ventiladores al máximo, mayor disipación térmica")
+                title: "TURBO / PERFORMANCE"
+                desc: "High fan speeds, maximum heat dissipation"
                 icon: "mode_fan"
                 highlightColor: Theme.alert
             }
 
             ProfileCard {
                 targetProfile: "balanced"
-                title: Cfg.t("EQUILIBRADO")
-                desc: Cfg.t("Curva automática estándar del BIOS HP")
+                title: "BALANCED"
+                desc: "Automatic HP BIOS thermal fan curve"
                 icon: "tune"
                 highlightColor: Theme.primary
             }
 
             ProfileCard {
                 targetProfile: "low-power"
-                title: Cfg.t("SILENCIOSO / ECO")
-                desc: Cfg.t("Ventiladores silenciosos a bajas RPM, bajo consumo")
+                title: "QUIET / ECO"
+                desc: "Quiet low-speed fans, energy saving"
                 icon: "air"
                 highlightColor: Theme.secondary
             }
         }
 
-        // ── temperaturas de referencia ──
+        // ── Real-Time Temperatures ──
         Row {
             width: parent.width
             spacing: 8
