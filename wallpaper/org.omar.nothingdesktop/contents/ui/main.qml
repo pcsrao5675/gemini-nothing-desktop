@@ -34,11 +34,28 @@ WallpaperItem {
     readonly property bool showAssistantWave: root.configuration.showAssistantWave ?? true
     readonly property string wavePos: root.configuration.wavePosition || "BottomCenter"
 
-    // Background Canvas with Nothing OS Subtle Dot Grid
+    // Background Canvas with Nothing OS Subtle Dot Grid & Ambient Load Light
     Rectangle {
         id: bgRect
         anchors.fill: parent
         color: root.bgColor
+
+        // Ambient Lighting Glow (shifts with system load)
+        Rectangle {
+            anchors.fill: parent
+            opacity: 0.12
+            gradient: Gradient {
+                GradientStop {
+                    position: 0.0
+                    color: (vitalsWidget && vitalsWidget.cpuVal > 80) ? "#D71921" : ((vitalsWidget && vitalsWidget.cpuVal > 50) ? "#FF8800" : root.accentColor)
+                    Behavior on color { ColorAnimation { duration: 1000 } }
+                }
+                GradientStop {
+                    position: 1.0
+                    color: "transparent"
+                }
+            }
+        }
 
         Canvas {
             id: gridCanvas

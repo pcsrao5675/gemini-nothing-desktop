@@ -13,19 +13,63 @@ import shutil
 import subprocess
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
+import socket
 
 HOST = "127.0.0.1"
 PORT = 8765
 CAPTURE_PATH = "/tmp/gemini_auto_capture.png"
 ACTIVE_FILE = "/tmp/gemini_active"
+SOCKET_PATH = "/tmp/gemini_assistant.sock"
 BRAVE_PROFILE_DIR = os.path.expanduser("~/.local/share/gemini-assistant/brave-profile")
 
-def set_active_state(val: bool):
+_socket_clients = []
+_socket_lock = threading.Lock()
+
+def broadcast_state(val: bool, cmd: str = ""):
+    """Broadcasts active state changes over the Unix domain socket push channel."""
+    msg = f"{'1' if val else '0'}:{cmd}\n".encode("utf-8")
+    with _socket_lock:
+        dead = []
+        for client in _socket_clients:
+            try:
+                client.sendall(msg)
+            except Exception:
+                dead.append(client)
+        for d in dead:
+            _socket_clients.remove(d)
+
+def start_socket_server():
+    """Listens on /tmp/gemini_assistant.sock for push subscribers."""
+    if os.path.exists(SOCKET_PATH):
+        try:
+            os.remove(SOCKET_PATH)
+        except OSError:
+            pass
+    try:
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.bind(SOCKET_PATH)
+        sock.listen(10)
+        os.chmod(SOCKET_PATH, 0o666)
+        while True:
+            client, _ = sock.accept()
+            # Send current state on connect
+            is_active = get_active_status()
+            try:
+                client.sendall(f"{is_active}:\n".encode("utf-8"))
+            except Exception:
+                pass
+            with _socket_lock:
+                _socket_clients.append(client)
+    except Exception as e:
+        print(f"[ScreenshotServer] Socket server error: {e}", file=sys.stderr)
+
+def set_active_state(val: bool, cmd: str = ""):
     try:
         with open(ACTIVE_FILE, "w") as f:
             f.write("1" if val else "0")
     except Exception as e:
         print(f"[ScreenshotServer] Error writing active state: {e}", file=sys.stderr)
+    broadcast_state(val, cmd)
 
 def monitor_brave_process():
     """Background monitor to reset active state if the assistant is closed/killed."""
@@ -259,6 +303,7 @@ class ScreenshotHandler(BaseHTTPRequestHandler):
 
 def run():
     set_active_state(False)
+    threading.Thread(target=start_socket_server, daemon=True).start()
     threading.Thread(target=monitor_brave_process, daemon=True).start()
     server = HTTPServer((HOST, PORT), ScreenshotHandler)
     print(f"[ScreenshotServer] Listening on http://{HOST}:{PORT}")

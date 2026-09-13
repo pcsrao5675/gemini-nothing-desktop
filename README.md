@@ -124,14 +124,26 @@ Manifest V3 browser extension tailored specifically for `https://gemini.google.c
 - **Borderless Window Controls**: Implements minimal glassmorphic controls (`#gemini-maximize-btn`, `#gemini-close-btn`) with blurred backdrop filters and global `Escape` key dismissal.
 - **Real-Time Visibility IPC**: Notifies daemon of window focus, blur, and tab visibility transitions via `/active?val=1` and `/active?val=0`.
 
-### 3. Daemon Microservice (`daemon/server.py`)
-A lightweight, dependency-free Python 3 HTTP server bound strictly to `127.0.0.1:8765`:
+### 4. Daemon Microservice (`daemon/server.py`)
+A lightweight, dependency-free Python 3 server bound strictly to `127.0.0.1:8765`:
+- **Dual Communication Architecture**: Coordinates HTTP REST operations alongside an instant Unix domain socket push server (`/tmp/gemini_assistant.sock`) that broadcasts active-state changes to subscribers without polling overhead.
 - **Clean Subprocess Coordination**: Invokes KDE Spectacle in headless background mode (`spectacle -b -n -o <path>`).
 - **Compositor Window Masking**: Automatically runs dynamic KWin scripts to minimize the Gemini overlay prior to screen capture, preventing the assistant from blocking the captured desktop content, and immediately restores and refocuses the window upon completion.
 - **Process Lifecycle Watchdog**: Background thread polls `pgrep` for active Brave instances matching the isolated user data directory and automatically clears `/tmp/gemini_active` if terminated.
 - **Systemd Integration**: Provided with standard dynamic user unit definitions (`gemini-screenshot.service` and `gemini-assistant.service`) utilizing `%h` path specifiers.
 
-### 4. KWin 6 Window Rules (`kwin/gemini-kwinrules.conf`)
+### 5. Notification Daemon (`daemon/notifications/`)
+A standalone `org.freedesktop.Notifications` D-Bus notification server:
+- **Nothing OS Visual Language**: Dark borderless container (`#0B0B0BE6`), Electric Blue and Red urgency stripes, Space Grotesk labels, and NDot timestamps.
+- **Per-App Rules & Scheduling**: Configurable via `~/.config/nothing-desktop/notifications.json` with customizable urgency overrides, timeouts, custom accents, and DND quiet hours.
+- **Persistent History Storage**: SQLite database store (`~/.local/share/nothing-desktop/notifications.db`) capturing recent notifications for the topbar bell dropdown.
+- **Reversible Plasma Suppression**: Non-destructive popup redirection via `plasmanotifyrc` backup and restoration.
+
+### 6. Spotlight Command Palette & Unified Settings (`palette/`, `settings/`)
+- **Spotlight Command Palette (`bin/nothing-palette.sh`)**: Quick launcher overlay with keyboard navigation for system commands, assistant toggles, fan modes, and apps.
+- **Unified Settings Interface (`bin/nothing-settings.sh`)**: Single QML settings hub configuring Island toggles, wallpaper widgets, notifications, cooling profiles, and keyboard shortcuts.
+
+### 7. KWin 6 Window Rules (`kwin/gemini-kwinrules.conf`)
 Dedicated compositor window rule ensuring true mobile-style floating overlay behavior:
 - Target window class: `brave-gemini.google.com__app-Default`.
 - Enforces forced override rules (`rule=3`) for:
@@ -141,7 +153,7 @@ Dedicated compositor window rule ensuring true mobile-style floating overlay beh
   - Exclude from Window Switcher (`skipswitcher=true`, `skipswitcherrule=3`)
   - Fixed Compact Geometry: Width 410px, Height 710px, positioned at bottom-right of primary display (`1490, 330` on 1080p).
 
-### 5. Shortcuts & Launcher (`bin/gemini-toggle.sh`, `desktop/`)
+### 8. Shortcuts & Launcher (`bin/gemini-toggle.sh`, `desktop/`)
 - **Toggle Script**: Interrogates KWin workspace clients via D-Bus; if Gemini is open, it minimizes or restores the window instantly. If closed, it spawns Brave with an isolated web application profile (`--user-data-dir=$XDG_DATA_HOME/gemini-assistant/brave-profile`) and loads the unpacked extension (`--load-extension=$XDG_DATA_HOME/gemini-assistant/extension`).
 - **Desktop Entry**: XDG compliant entry registering dedicated hardware accelerators:
   - HP Omen Dedicated AI key: `Launch (2)`

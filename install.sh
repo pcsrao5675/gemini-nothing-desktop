@@ -173,10 +173,20 @@ mkdir -p "$ASSISTANT_DEST/notifications"
 cp -r "$SCRIPT_DIR/daemon/notifications/"* "$ASSISTANT_DEST/notifications/"
 chmod +x "$ASSISTANT_DEST/notifications/server.py"
 
-# 5. Deploy Toggle Script
-echo "-> Deploying launcher script to $TOGGLE_DEST..."
+# 5. Deploy Launchers & Tools
+echo "-> Deploying launchers to $BIN_DIR..."
 cp "$SCRIPT_DIR/bin/gemini-toggle.sh" "$TOGGLE_DEST"
 chmod +x "$TOGGLE_DEST"
+
+cp "$SCRIPT_DIR/bin/nothing-palette.sh" "$BIN_DIR/nothing-palette.sh"
+chmod +x "$BIN_DIR/nothing-palette.sh"
+
+cp "$SCRIPT_DIR/bin/nothing-settings.sh" "$BIN_DIR/nothing-settings.sh"
+chmod +x "$BIN_DIR/nothing-settings.sh"
+
+mkdir -p "$ASSISTANT_DEST/palette" "$ASSISTANT_DEST/settings"
+cp -r "$SCRIPT_DIR/palette/"* "$ASSISTANT_DEST/palette/"
+cp -r "$SCRIPT_DIR/settings/"* "$ASSISTANT_DEST/settings/"
 
 # 6. Deploy Desktop Entry
 echo "-> Deploying desktop entry to $DESKTOP_DEST..."

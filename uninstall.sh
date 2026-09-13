@@ -120,6 +120,9 @@ if [[ -f "$TOGGLE_DEST" ]]; then
     echo "   Removed: $TOGGLE_DEST (gemini-toggle)"
 fi
 
+rm -f "$BIN_DIR/nothing-palette.sh"
+rm -f "$BIN_DIR/nothing-settings.sh"
+
 if [[ -f "$DESKTOP_DEST" ]]; then
     rm -f "$DESKTOP_DEST"
     echo "   Removed: $DESKTOP_DEST"
@@ -127,6 +130,7 @@ fi
 
 rm -f "$SYSTEMD_USER_DIR/gemini-screenshot.service"
 rm -f "$SYSTEMD_USER_DIR/gemini-assistant.service"
+rm -f "$SYSTEMD_USER_DIR/gemini-notifications.service"
 
 # 3. Clean KWin 6 rules
 if [[ -f "$KWIN_RULES_FILE" ]]; then
