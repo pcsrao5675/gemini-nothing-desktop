@@ -175,19 +175,76 @@ Item {
         anchors.fill: parent
         color: "transparent"
         border.color: root.currentColor
-        border.width: 2.5
-        radius: 4
+        border.width: 2.0
+        radius: 6
         opacity: (!root.isCharging && !notifPulseAnim.running && !pomoFlashAnim.running) ? 0.0 : root.currentOpacity
         visible: opacity > 0.005
 
-        // Subtle inner glow
+        // Subtle inner bloom
         Rectangle {
             anchors.fill: parent
             anchors.margins: 1.5
             color: "transparent"
-            border.color: Qt.rgba(root.currentColor.r, root.currentColor.g, root.currentColor.b, 0.4)
+            border.color: Qt.rgba(root.currentColor.r, root.currentColor.g, root.currentColor.b, 0.45)
             border.width: 1.5
-            radius: 3
+            radius: 5
+        }
+
+        // ── Nothing OS Segmented Corner Brackets (From Stitch Iteration 4) ──
+        // Top-Left Bracket
+        Item {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            width: 28
+            height: 28
+            Rectangle { anchors.top: parent.top; anchors.left: parent.left; width: 28; height: 3.5; color: root.currentColor }
+            Rectangle { anchors.top: parent.top; anchors.left: parent.left; width: 3.5; height: 28; color: root.currentColor }
+        }
+
+        // Top-Right Bracket
+        Item {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            width: 28
+            height: 28
+            Rectangle { anchors.top: parent.top; anchors.right: parent.right; width: 28; height: 3.5; color: root.currentColor }
+            Rectangle { anchors.top: parent.top; anchors.right: parent.right; width: 3.5; height: 28; color: root.currentColor }
+        }
+
+        // Bottom-Left Bracket
+        Item {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            width: 28
+            height: 28
+            Rectangle { anchors.bottom: parent.bottom; anchors.left: parent.left; width: 28; height: 3.5; color: root.currentColor }
+            Rectangle { anchors.bottom: parent.bottom; anchors.left: parent.left; width: 3.5; height: 28; color: root.currentColor }
+        }
+
+        // Bottom-Right Bracket
+        Item {
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            width: 28
+            height: 28
+            Rectangle { anchors.bottom: parent.bottom; anchors.right: parent.right; width: 28; height: 3.5; color: root.currentColor }
+            Rectangle { anchors.bottom: parent.bottom; anchors.right: parent.right; width: 3.5; height: 28; color: root.currentColor }
+        }
+
+        // Mid-edge indexing notches
+        Rectangle {
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 48
+            height: 3
+            color: root.currentColor
+        }
+        Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 48
+            height: 3
+            color: root.currentColor
         }
     }
 }

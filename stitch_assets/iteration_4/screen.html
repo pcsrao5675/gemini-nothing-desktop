@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<!-- Google Fonts: Space Grotesk, JetBrains Mono, Silkscreen & VT323 for authentic Nothing NDot style -->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Silkscreen:wght@400;700&amp;family=VT323&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+        background-color: #060708;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    /* Authentic Nothing OS dot grid matrix wallpaper */
+    .nothing-dot-matrix {
+      background-color: #060708;
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.12) 1.2px, transparent 1.2px),
+        radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 24px 24px, 12px 12px;
+      background-position: 0 0, 12px 12px;
+    }
+    /* Focus Mode Background Dimming */
+    body.focus-mode-active .nothing-dot-matrix {
+      opacity: 0.25;
+      filter: blur(1px);
+    }
+    /* NDot Typography simulation */
+    .font-ndot {
+      font-family: 'Silkscreen', 'VT323', 'Space Grotesk', monospace;
+      letter-spacing: -0.03em;
+    }
+    .font-matrix-display {
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      letter-spacing: -0.05em;
+    }
+    /* Signature Nothing Red Accents */
+    .nothing-red-led {
+      background-color: #D71921;
+      box-shadow: 0 0 8px #D71921, 0 0 2px #FF2E2E;
+    }
+    .nothing-red-glow {
+      box-shadow: 0 0 12px rgba(215, 25, 33, 0.65);
+    }
+    /* Cyan / Electric Blue Accent (#4DA3FF) */
+    .nothing-blue-led {
+      background-color: #4DA3FF;
+      box-shadow: 0 0 8px #4DA3FF, 0 0 2px #A2C9FF;
+    }
+    /* Segmented Glyph Interface Light Bar */
+    .glyph-light {
+      background-color: #FFFFFF;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.35);
+    }
+    .glyph-light-soft {
+      background-color: rgba(255, 255, 255, 0.45);
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+    }
+    .glyph-arc {
+      border-color: rgba(255, 255, 255, 0.85);
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+    }
+    /* Smoked Glass Surfaces */
+    .smoked-glass {
+      background: rgba(14, 16, 19, 0.84);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .smoked-glass-subtle {
+      background: rgba(10, 11, 14, 0.65);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .dotted-border {
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+    }
+
+    /* ==================== 1. GLYPH PERIMETER LIGHT STRIP ==================== */
+    .glyph-perimeter {
+      position: fixed;
+      inset: 2px;
+      pointer-events: none;
+      z-index: 9999;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.35s ease;
+    }
+    /* Segmented corners and edge ticks */
+    .glyph-corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-color: rgba(255, 255, 255, 0.25);
+      pointer-events: none;
+    }
+    .glyph-corner-tl { top: 0; left: 0; border-top: 2px solid; border-left: 2px solid; border-top-left-radius: 8px; }
+    .glyph-corner-tr { top: 0; right: 0; border-top: 2px solid; border-right: 2px solid; border-top-right-radius: 8px; }
+    .glyph-corner-bl { bottom: 0; left: 0; border-bottom: 2px solid; border-left: 2px solid; border-bottom-left-radius: 8px; }
+    .glyph-corner-br { bottom: 0; right: 0; border-bottom: 2px solid; border-right: 2px solid; border-bottom-right-radius: 8px; }
+
+    /* Animated states for perimeter */
+    @keyframes glyph-breath-blue {
+      0%, 100% {
+        border-color: rgba(77, 163, 255, 0.25);
+        box-shadow: inset 0 0 14px rgba(77, 163, 255, 0.15), 0 0 10px rgba(77, 163, 255, 0.2);
+      }
+      50% {
+        border-color: rgba(77, 163, 255, 0.85);
+        box-shadow: inset 0 0 28px rgba(77, 163, 255, 0.45), 0 0 22px rgba(77, 163, 255, 0.55);
+      }
+    }
+    .glyph-state-charging {
+      animation: glyph-breath-blue 2.8s ease-in-out infinite !important;
+      border-color: #4DA3FF !important;
+    }
+    @keyframes glyph-pulse-notif {
+      0% {
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: none;
+      }
+      20%, 60% {
+        border-color: rgba(255, 255, 255, 0.95);
+        box-shadow: inset 0 0 35px rgba(255, 255, 255, 0.6), 0 0 25px rgba(255, 255, 255, 0.7);
+      }
+      40%, 80% {
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+      }
+      100% {
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: none;
+      }
+    }
+    .glyph-state-notif {
+      animation: glyph-pulse-notif 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 2 !important;
+    }
+    @keyframes glyph-flash-red {
+      0%, 100% {
+        border-color: rgba(215, 25, 33, 0.2);
+        box-shadow: none;
+      }
+      30%, 70% {
+        border-color: #D71921;
+        box-shadow: inset 0 0 45px rgba(215, 25, 33, 0.65), 0 0 35px rgba(255, 46, 46, 0.75);
+      }
+    }
+    .glyph-state-pomored {
+      animation: glyph-flash-red 1.6s ease-in-out 2 !important;
+    }
+
+    /* ==================== 2. DOT-DISSOLVE TRANSITION ENGINE ==================== */
+    .dot-dissolve-mask {
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes dot-dissolve-out {
+      0% {
+        opacity: 1;
+        filter: contrast(100%);
+        transform: scale(1);
+        mask-image: radial-gradient(circle 2px, black 100%, transparent 0);
+        mask-size: 8px 8px;
+      }
+      45% {
+        opacity: 0.65;
+        mask-image: radial-gradient(circle 1.2px, black 100%, transparent 0);
+        mask-size: 6px 6px;
+      }
+      100% {
+        opacity: 0;
+        filter: contrast(180%);
+        transform: scale(0.985);
+        mask-image: radial-gradient(circle 0px, black 100%, transparent 0);
+        mask-size: 4px 4px;
+      }
+    }
+    @keyframes dot-dissolve-in {
+      0% {
+        opacity: 0;
+        transform: scale(0.985);
+        mask-image: radial-gradient(circle 0px, black 100%, transparent 0);
+        mask-size: 4px 4px;
+      }
+      55% {
+        opacity: 0.75;
+        mask-image: radial-gradient(circle 1.5px, black 100%, transparent 0);
+        mask-size: 6px 6px;
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        mask-image: none;
+      }
+    }
+    .is-dot-dissolving-out {
+      animation: dot-dissolve-out 0.22s cubic-bezier(0.3, 0, 0.8, 0.15) forwards;
+    }
+    .is-dot-dissolving-in {
+      animation: dot-dissolve-in 0.28s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    }
+
+    /* ==================== 5. FOCUS MODE HIDING LOGIC ==================== */
+    .focus-mode-hideable {
+      transition: all 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    body.focus-mode-active .focus-mode-hideable {
+      opacity: 0.05 !important;
+      pointer-events: none !important;
+      transform: scale(0.96);
+      filter: blur(4px) grayscale(80%);
+    }
+    body.focus-mode-active .focus-mode-keep-active {
+      transform: scale(1.02);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.08);
+      z-index: 30;
+    }
+    /* Day Hairline discrete dot styling */
+    .day-tick {
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .day-tick:hover {
+      transform: scaleY(1.5);
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "nothing-red": "#D71921",
+            "nothing-red-bright": "#FF2E2E",
+            "nothing-black": "#060708",
+            "nothing-surface": "#0e1013",
+            "nothing-surface-subtle": "#15171b",
+            "nothing-blue": "#4DA3FF",
+            "nothing-border": "rgba(255, 255, 255, 0.08)",
+            "nothing-border-light": "rgba(255, 255, 255, 0.15)",
+            "nothing-grey": "#8A8D91",
+            "nothing-grey-dark": "#4a4d52",
+            "nothing-white": "#F4F4F5",
+            "on-background": "#e3e2e3",
+            "primary": "#F4F4F5",
+            "surface": "#0e1013"
+          },
+          borderRadius: {
+            "nothing-card": "26px",
+            "nothing-pill": "9999px",
+            "nothing-widget": "22px"
+          },
+          fontFamily: {
+            "mono": ["JetBrains Mono", "monospace"],
+            "sans": ["Space Grotesk", "sans-serif"],
+            "ndot": ["Silkscreen", "VT323", "monospace"],
+            "display": ["Space Grotesk", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#060708] text-[#e3e2e3] font-mono min-h-screen flex flex-col justify-between nothing-dot-matrix selection:bg-[#D71921]/30 selection:text-white relative overflow-x-hidden transition-colors duration-500">
+<!-- ==================== 1. GLYPH-STYLE AMBIENT BORDER LIGHT ==================== -->
+<div class="glyph-perimeter" id="glyphPerimeter">
+<div class="glyph-corner glyph-corner-tl"></div>
+<div class="glyph-corner glyph-corner-tr"></div>
+<div class="glyph-corner glyph-corner-bl"></div>
+<div class="glyph-corner glyph-corner-br"></div>
+<!-- Top Center Glyph Notch Ticks -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-0.5 bg-[#060708] border-b border-white/20 rounded-b-md">
+<div class="w-1.5 h-1 bg-white/40 rounded-full"></div>
+<div class="w-8 h-1 glyph-light rounded-full" id="glyphStatusBar"></div>
+<div class="w-1.5 h-1 bg-white/40 rounded-full"></div>
+</div>
+</div>
+<!-- Subtle Ambient Glyph Arc Background at Top Right -->
+<div class="pointer-events-none fixed top-0 right-1/4 w-[460px] h-[240px] opacity-15 overflow-hidden z-0">
+<svg class="w-full h-full" fill="none" viewbox="0 0 460 240">
+<path d="M 10 240 A 220 220 0 0 1 450 240" stroke="white" stroke-dasharray="14 8" stroke-width="1.5"></path>
+</svg>
+</div>
+<!-- ==================== TOP SYSTEM STATUS BAR (Nothing OS 3.0 Hardware Bezel) ==================== -->
+<header class="w-full h-12 border-b border-white/[0.08] bg-[#060708]/92 backdrop-blur-2xl fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 select-none shadow-[0_2px_16px_rgba(0,0,0,0.8)]">
+<!-- Left: Recording / Beacon & OS Identification -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
+<span class="w-2 h-2 rounded-full nothing-red-led animate-pulse" id="osRecordingBeacon"></span>
+<span class="font-ndot text-[10px] tracking-[0.22em] text-white font-bold">NOTHING(R) OS 3.0</span>
+</div>
+<div class="h-3.5 w-px bg-white/10 hidden sm:block"></div>
+<!-- Weather Quick Chip -->
+<div class="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs">
+<span class="material-symbols-outlined text-[13px] text-white">wb_sunny</span>
+<span class="font-ndot text-[9px] tracking-wider text-white">TYO 22°C</span>
+</div>
+<!-- Active Glyph Strip Indicator -->
+<div class="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.03] border border-white/[0.06]">
+<span class="w-2.5 h-1 rounded-full glyph-light" id="activeGlyphDot"></span>
+<span class="w-1.5 h-1 rounded-full glyph-light-soft"></span>
+<span class="w-1 h-1 rounded-full bg-white/20"></span>
+<span class="font-ndot text-[9px] tracking-widest text-[#8A8D91] ml-0.5" id="glyphStateText">GLYPH // ACTIVE</span>
+</div>
+</div>
+<!-- Center: Primary Dot-Matrix Master Chrono -->
+<div class="flex items-center gap-2.5">
+<div class="w-1.5 h-1.5 rounded-full bg-white/40"></div>
+<span class="font-ndot text-sm font-bold tracking-widest text-white transition-opacity" id="nav-time">10:42</span>
+<span class="text-[9px] text-[#8A8D91] font-mono tracking-widest uppercase">· WED 24 OCT</span>
+<div class="w-1.5 h-1.5 rounded-full bg-white/40"></div>
+</div>
+<!-- Right: Interactive Glyph Simulator Triggers & Status Controls -->
+<div class="flex items-center gap-2 font-mono">
+<!-- Glyph Simulation Quick Chips -->
+<div class="hidden lg:flex items-center gap-1 bg-white/[0.03] p-1 rounded-full border border-white/[0.08] text-[8px] font-ndot">
+<button class="px-2 py-0.5 rounded-full hover:bg-white/10 text-[#4DA3FF] hover:text-white transition-colors flex items-center gap-1" onclick="triggerGlyphEffect('charging')" title="Test Cyan Charge Breath">
+<span class="w-1.5 h-1.5 rounded-full nothing-blue-led"></span>CHARGE
+  </button>
+<button class="px-2 py-0.5 rounded-full hover:bg-white/10 text-white transition-colors flex items-center gap-1" onclick="triggerGlyphEffect('notif')" title="Test Notification Pulse">
+<span class="w-1.5 h-1.5 rounded-full bg-white"></span>NOTIF
+  </button>
+<button class="px-2 py-0.5 rounded-full hover:bg-white/10 text-[#FF2E2E] transition-colors flex items-center gap-1" onclick="triggerGlyphEffect('pomo')" title="Test Pomodoro Finish Flash">
+<span class="w-1.5 h-1.5 rounded-full nothing-red-led"></span>POMO
+  </button>
+</div>
+<div class="h-3 w-px bg-white/10 hidden sm:block"></div>
+<!-- One-Click Focus Mode Quick Trigger Chip -->
+<button class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/15 hover:border-white/40 transition-all text-white font-ndot text-[9px] cursor-pointer" id="navFocusBtn" onclick="toggleFocusMode()">
+<span class="material-symbols-outlined text-[13px]" id="navFocusIcon">center_focus_strong</span>
+<span id="navFocusLabel">FOCUS</span>
+<span class="w-1.5 h-1.5 rounded-full bg-white/30" id="navFocusLed"></span>
+</button>
+<!-- Battery Pill with Charging State -->
+<div class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.03] border border-white/[0.07]">
+<div class="w-3 h-1.5 border border-white/80 rounded-sm p-[1px] flex items-center">
+<div class="bg-white h-full w-[94%] rounded-2xs" id="batteryLevelBar"></div>
+</div>
+<span class="font-ndot text-[9px] font-bold text-white">94%</span>
+</div>
+<!-- Profile Badge -->
+<div class="relative">
+<div class="w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[14px]">person</span>
+</div>
+<span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full nothing-red-led"></span>
+</div>
+</div>
+</header>
+<!-- ==================== MAIN 3-COLUMN LAPTOP WORKSPACE ==================== -->
+<main class="w-full flex-1 pt-16 pb-24 px-4 sm:px-6 lg:px-8 max-w-[1740px] mx-auto flex flex-col justify-center relative z-10">
+<!-- Top System Beacon Pill Strip (Nothing OS Signature Header) -->
+<div class="w-full h-8 mb-3 rounded-full smoked-glass px-4 flex items-center justify-between shadow-sm text-[10px] focus-mode-hideable">
+<div class="flex items-center gap-3 font-mono">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full nothing-red-led"></span>
+<span class="font-ndot text-[9px] font-bold tracking-[0.2em] text-white uppercase">SYS // NORMAL</span>
+</div>
+<span class="text-white/20">|</span>
+<div class="flex items-center gap-1.5 text-white/80 font-ndot text-[8px] tracking-wider">
+<span class="material-symbols-outlined text-[13px] text-white">wb_sunny</span>
+<span>TOKYO 22°C · 1014 hPa · AIR GOOD</span>
+</div>
+<span class="hidden md:inline text-white/20">|</span>
+<div class="hidden md:flex items-center gap-1.5 text-[#8A8D91] text-[9px]">
+<span class="material-symbols-outlined text-[13px] text-white">graphic_eq</span>
+<span class="font-mono">AUDIO: 96KHZ / 24-BIT HI-RES</span>
+</div>
+</div>
+<!-- Right Side Glyph / AI Beacon -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white text-black font-ndot text-[8px] font-bold tracking-wider uppercase shadow-[0_0_12px_rgba(255,255,255,0.4)]">
+<span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+<span>NOTHING AI ENGINE // V2.5</span>
+</div>
+<div class="flex items-center gap-1 text-[#8A8D91] font-ndot text-[9px]">
+<span class="material-symbols-outlined text-[13px] text-[#4DA3FF]">bolt</span>
+<span class="text-white font-bold">68W TURBO</span>
+</div>
+</div>
+</div>
+<!-- Master Grid Matrix (16:10 Laptop Ergonomics) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+<!-- ==================== LEFT COLUMN: TELEMETRY & HARDWARE VITALS + BUFFER ==================== -->
+<div class="lg:col-span-3 flex flex-col gap-3.5 justify-between">
+<!-- Telemetry Hardware Matrix Card -->
+<div class="smoked-glass rounded-nothing-card p-4 flex flex-col gap-3 relative overflow-hidden shadow-2xl focus-mode-hideable">
+<!-- Top Subtle Glyph Accent Line -->
+<div class="absolute top-0 left-6 right-6 h-[1.5px] flex items-center justify-between">
+<div class="w-12 h-full glyph-light rounded-full"></div>
+<div class="w-2 h-full bg-white/20 rounded-full"></div>
+<div class="w-16 h-full glyph-light-soft rounded-full"></div>
+</div>
+<div class="flex items-center justify-between pb-1 pt-1 border-b border-white/[0.06]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-white">developer_board</span>
+<span class="font-ndot text-[10px] font-bold tracking-[0.2em] text-white uppercase">TELEMETRY // VITALS</span>
+</div>
+<span class="font-ndot text-[8px] text-white font-bold px-2 py-0.5 rounded-full bg-white/10 border border-white/15">DDR5 6400</span>
+</div>
+<!-- 4 Distinct Nothing Hardware Quadrants -->
+<div class="grid grid-cols-2 gap-2.5">
+<!-- CPU Tile -->
+<div class="bg-[#090a0c] p-2.5 rounded-nothing-widget border border-white/[0.06] flex flex-col justify-between h-[96px] relative group hover:border-white/20 transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-ndot text-[8px] text-[#8A8D91] tracking-wider uppercase font-semibold">CPU LOAD</span>
+<span class="w-1.5 h-1.5 rounded-full bg-white glyph-light"></span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-baseline">
+<span class="font-ndot text-2xl font-bold text-white tracking-tight">14</span>
+<span class="font-ndot text-[11px] text-[#8A8D91] ml-0.5">%</span>
+</div>
+<svg class="w-9 h-9 -rotate-90" viewbox="0 0 36 36">
+<circle cx="18" cy="18" fill="none" r="14" stroke="rgba(255,255,255,0.1)" stroke-dasharray="2 3" stroke-width="3"></circle>
+<circle cx="18" cy="18" fill="none" r="14" stroke="#FFFFFF" stroke-dasharray="14 100" stroke-linecap="round" stroke-width="3"></circle>
+</svg>
+</div>
+<div class="flex items-center justify-between text-[8px] font-mono text-[#8A8D91]">
+<span class="font-ndot text-[7px] text-white">8-CORE</span>
+<span>3.8 GHZ BOOST</span>
+</div>
+</div>
+<!-- RAM Tile -->
+<div class="bg-[#090a0c] p-2.5 rounded-nothing-widget border border-white/[0.06] flex flex-col justify-between h-[96px] group hover:border-white/20 transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-ndot text-[8px] text-[#8A8D91] tracking-wider uppercase font-semibold">RAM ALLOC</span>
+<span class="font-ndot text-[8px] text-white">32GB</span>
+</div>
+<div>
+<div class="flex items-baseline gap-1">
+<span class="font-ndot text-2xl font-bold text-white tracking-tight">6.2</span>
+<span class="font-ndot text-[10px] text-[#8A8D91]">GB</span>
+</div>
+<div class="font-ndot text-[7px] text-[#8A8D91] tracking-wider mt-0.5">19% BUFFERED</div>
+</div>
+<div class="flex gap-1 w-full h-1.5">
+<div class="h-full w-2 bg-white rounded-full"></div>
+<div class="h-full w-2 bg-white rounded-full"></div>
+<div class="h-full flex-1 bg-white/10 rounded-full"></div>
+</div>
+</div>
+<!-- Power / Cell Tile (With Cyan 68W highlight) -->
+<div class="bg-[#090a0c] p-2.5 rounded-nothing-widget border border-white/[0.06] flex flex-col justify-between h-[96px] group hover:border-white/20 transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-ndot text-[8px] text-[#8A8D91] tracking-wider uppercase font-semibold">POWER CELL</span>
+<span class="material-symbols-outlined text-[13px] text-[#4DA3FF]">bolt</span>
+</div>
+<div class="flex items-baseline">
+<span class="font-ndot text-2xl font-bold text-white tracking-tight">94</span>
+<span class="font-ndot text-[11px] text-white ml-0.5">%</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full nothing-blue-led"></span>
+<span class="font-ndot text-[7px] text-[#4DA3FF] font-bold tracking-wider uppercase">68W CHARGING</span>
+</div>
+</div>
+<!-- Thermals Tile -->
+<div class="bg-[#090a0c] p-2.5 rounded-nothing-widget border border-white/[0.06] flex flex-col justify-between h-[96px] group hover:border-white/20 transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-ndot text-[8px] text-[#8A8D91] tracking-wider uppercase font-semibold">DIE THERMAL</span>
+<span class="material-symbols-outlined text-[13px] text-white">device_thermostat</span>
+</div>
+<div class="flex items-baseline">
+<span class="font-ndot text-2xl font-bold text-white tracking-tight">42</span>
+<span class="font-ndot text-[11px] text-white ml-0.5">°C</span>
+</div>
+<div class="flex items-center justify-between text-[7px] font-mono text-[#8A8D91]">
+<span class="font-ndot text-[7px] text-white">VAPOR CHAMBER</span>
+<span class="font-ndot text-[#8A8D91]">0 RPM</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Schedule Mini Monitor (Always Synced) -->
+<div class="smoked-glass rounded-nothing-card p-3.5 flex flex-col gap-2 shadow-2xl focus-mode-hideable">
+<div class="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-white">sync_alt</span>
+<span class="font-ndot text-[10px] font-bold tracking-[0.2em] text-white uppercase">DEVICE SYNC</span>
+</div>
+<span class="font-ndot text-[8px] text-white bg-white/10 px-1.5 py-0.5 rounded-full">PHONE (2) OK</span>
+</div>
+<div class="flex items-center justify-between text-[9px] font-ndot text-[#8A8D91] py-1">
+<span>NOTHING OS CLOUD</span>
+<span class="text-white">ENCRYPTED // ACTIVE</span>
+</div>
+</div>
+<!-- Scratchpad / Terminal NVMe Buffer (Kept active in Focus Mode!) -->
+<div class="smoked-glass rounded-nothing-card p-4 flex flex-col gap-2 shadow-2xl relative border-white/15 focus-mode-keep-active" id="scratchpadCard">
+<div class="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full nothing-red-led"></span>
+<span class="font-ndot text-[10px] font-bold tracking-[0.2em] text-white uppercase">BUFFER // NVME_0</span>
+</div>
+<span class="font-ndot text-[8px] text-[#8A8D91] uppercase">FOCUS READY</span>
+</div>
+<div class="bg-[#090a0c] p-3 rounded-nothing-widget border border-white/[0.06] dotted-border text-[11px] font-mono text-[#8A8D91] leading-relaxed">
+<p><span class="text-white font-bold font-ndot">&gt;&gt;</span> Iteration 4 Glyph bus connected</p>
+<p><span class="text-white font-bold font-ndot">&gt;&gt;</span> Day-progress ticks: 48 units active</p>
+<p><span class="text-white font-bold font-ndot">&gt;&gt;</span> Dot-dissolve engine: calibrated<span class="inline-block w-1.5 h-3.5 bg-white ml-1.5 align-middle glyph-light animate-pulse"></span></p>
+</div>
+<div class="flex items-center justify-between pt-1 text-[8px] font-ndot text-[#8A8D91]">
+<span>PERSISTENT BUFFER</span>
+<span class="text-white hover:underline cursor-pointer" onclick="clearScratchpad()">CLEAR [DEL]</span>
+</div>
+</div>
+</div>
+<!-- ==================== CENTER HERO COLUMN: CHRONO + DAY PROGRESS + NOW CARD ==================== -->
+<div class="lg:col-span-6 flex flex-col gap-3.5 justify-between">
+<!-- Grand Nothing OS Dot-Matrix Clock & Solar Station (Signature Card - Focus Hero) -->
+<div class="smoked-glass rounded-nothing-card p-6 flex flex-col items-center justify-between relative shadow-2xl overflow-hidden focus-mode-keep-active" id="heroClockCard">
+<!-- Authentic Nothing Phone Glyph Interface Arcs (Backlight simulation) -->
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-20 rounded-b-full border-b-2 border-white/30 glyph-arc pointer-events-none opacity-40"></div>
+<div class="absolute top-2 right-4 flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full nothing-red-led"></span>
+<span class="font-ndot text-[8px] font-bold text-white tracking-widest uppercase">REC</span>
+</div>
+<!-- Header bar -->
+<div class="w-full flex items-center justify-between text-[#8A8D91] text-[10px] pb-2 border-b border-white/[0.06]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-white">schedule</span>
+<span class="font-ndot tracking-[0.22em] text-white font-bold uppercase">CHRONO // MATRIX STATION</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/10 border border-white/15">
+<span class="w-1.5 h-1.5 rounded-full bg-white glyph-light"></span>
+<span class="font-ndot text-[8px] text-white font-bold tracking-widest uppercase">ATOMIC TIME UTC+9</span>
+</div>
+</div>
+<!-- Grand NDot Matrix Digital Clock (With Dot-Dissolve Engine Trigger) -->
+<div class="py-4 flex items-center justify-center gap-3 relative">
+<div class="flex items-baseline dot-dissolve-mask" id="heroClockWrapper">
+<span class="font-ndot font-bold text-[72px] sm:text-[88px] lg:text-[100px] leading-none text-white tracking-tight drop-shadow-[0_0_20px_rgba(255,255,255,0.25)]" id="hero-clock">2:47</span>
+</div>
+<div class="flex flex-col items-start justify-end pb-3">
+<span class="font-ndot text-2xl font-bold text-white leading-none">AM</span>
+<div class="flex items-center gap-1 mt-2">
+<span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+<span class="font-ndot text-[9px] text-[#8A8D91] tracking-widest" id="heroSeconds">SEC 28</span>
+</div>
+</div>
+</div>
+<!-- Distinctive Nothing OS Date Pill with dot matrix typography -->
+<div class="px-5 py-1.5 rounded-full bg-[#090a0c] border border-white/15 mb-2 flex items-center gap-2 shadow-inner">
+<span class="w-1.5 h-1.5 rounded-full nothing-red-led"></span>
+<span class="font-ndot text-[11px] font-bold tracking-[0.2em] text-white uppercase">THURSDAY, OCTOBER 24, 2024</span>
+</div>
+<!-- ==================== 4. DAY-PROGRESS HAIRLINE ==================== -->
+<div class="w-full px-2 py-2 flex flex-col gap-1.5 my-1">
+<div class="flex items-center justify-between text-[8px] font-ndot text-[#8A8D91]">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full nothing-blue-led"></span>
+<span class="text-white tracking-widest">DAY PROGRESS // 24-HR CYCLE</span>
+</div>
+<div class="flex items-center gap-2 font-mono">
+<span class="text-[#4DA3FF] font-bold font-ndot">68.4% ELAPSED</span>
+<span class="text-white/30">|</span>
+<span>16H 25M PAST</span>
+</div>
+</div>
+<!-- 48 Discrete Micro-Ticks (Nothing Hardware Hairline) -->
+<div class="w-full flex items-center justify-between gap-[2px] pt-1" id="dayHairlineTicks">
+<!-- Generated dynamically via JS, previewed with 48 ticks: 33 filled (68%), 15 dimmed -->
+</div>
+<div class="flex justify-between text-[7px] font-ndot text-[#8A8D91]/70 px-0.5">
+<span>00:00 (DAWN)</span>
+<span>12:00 (NOON)</span>
+<span>23:59 (MIDNIGHT)</span>
+</div>
+</div>
+<!-- World Time & Solar Cycle Glyph Pill Strip -->
+<div class="w-full pt-3 border-t border-white/[0.06] flex flex-wrap items-center justify-between text-[#8A8D91] text-[10px] gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-white">wb_twilight</span>
+<span class="font-ndot text-[8px] uppercase tracking-wider font-bold text-white">SUNSET IN 6H 18M</span>
+</div>
+<div class="flex items-center gap-3.5 font-ndot text-[9px] tracking-wider text-[#8A8D91]">
+<span>PEK <strong class="text-white font-bold">09:47</strong></span>
+<span>BER <strong class="text-white font-bold">03:47</strong></span>
+<span>SFO <strong class="text-white font-bold">18:47</strong></span>
+<span class="px-2 py-0.5 rounded-full bg-white/10 text-white border border-white/10 font-bold">UTC 02:47</span>
+</div>
+</div>
+</div>
+<!-- ==================== 3. UNIFIED "NOW // CONTEXT" CARD ==================== -->
+<!-- Priority Carousel & Contextual Switcher for Pomodoro, Media FLAC Player, Agenda Protocol -->
+<div class="smoked-glass rounded-nothing-card p-4 flex flex-col gap-3 shadow-2xl relative overflow-hidden focus-mode-hideable" id="unifiedNowCard">
+<!-- Top Priority Pill Indicator & Tabs -->
+<div class="flex items-center justify-between pb-2 border-b border-white/[0.06]">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full nothing-red-led" id="nowStatusDot"></span>
+<span class="font-ndot text-[10px] font-bold tracking-[0.2em] text-white uppercase">NOW // CONTEXT</span>
+<span class="font-ndot text-[8px] px-2 py-0.5 rounded-full bg-white/10 text-[#8A8D91] border border-white/10" id="nowPriorityBadge">PRIORITY: P1_FOCUS</span>
+</div>
+<!-- Mode Switcher Tabs -->
+<div class="flex items-center gap-1 bg-[#090a0c] p-1 rounded-full border border-white/10">
+<button class="px-2.5 py-1 rounded-full text-[8px] font-ndot font-bold tracking-wider transition-all bg-white text-black shadow-[0_0_8px_rgba(255,255,255,0.4)]" id="tabBtnPomo" onclick="switchNowMode('pomodoro')">
+        POMODORO [ACTIVE]
+      </button>
+<button class="px-2.5 py-1 rounded-full text-[8px] font-ndot font-semibold tracking-wider text-[#8A8D91] hover:text-white transition-all" id="tabBtnMedia" onclick="switchNowMode('media')">
+        MEDIA [FLAC]
+      </button>
+<button class="px-2.5 py-1 rounded-full text-[8px] font-ndot font-semibold tracking-wider text-[#8A8D91] hover:text-white transition-all" id="tabBtnAgenda" onclick="switchNowMode('agenda')">
+        AGENDA [SYNC]
+      </button>
+</div>
+</div>
+<!-- Dynamic Content Slot with Dot-Dissolve Transition -->
+<div class="min-h-[105px] flex items-center dot-dissolve-mask" id="nowContentContainer">
+<!-- VIEW 1: POMODORO SPRINT (Default) -->
+<div class="w-full flex items-center justify-between" id="viewPomodoro">
+<div class="flex items-center gap-4">
+<div class="relative w-16 h-16 shrink-0">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 36 36">
+<circle cx="18" cy="18" fill="none" r="14.5" stroke="rgba(255,255,255,0.12)" stroke-dasharray="2 3" stroke-width="2.5"></circle>
+<circle cx="18" cy="18" fill="none" filter="drop-shadow(0 0 4px rgba(255,255,255,0.8))" r="14.5" stroke="#FFFFFF" stroke-dasharray="78, 100" stroke-linecap="round" stroke-width="2.8"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[18px]">hourglass_top</span>
+</div>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-ndot text-[9px] font-bold tracking-[0.2em] text-white uppercase">FOCUS // SPRINT</span>
+<span class="w-1.5 h-1.5 rounded-full glyph-light animate-pulse"></span>
+</div>
+<div class="font-ndot text-3xl font-bold text-white tracking-tight leading-tight" id="pomoCountdown">21:45</div>
+<span class="font-ndot text-[8px] text-[#8A8D91] tracking-wider">TARGET 25:00 • 4 SESSIONS COMPLETED • CYCLE 2</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 rounded-full bg-white text-black font-ndot text-[9px] font-bold uppercase tracking-widest hover:bg-opacity-90 transition-opacity shadow-[0_0_10px_rgba(255,255,255,0.4)]" id="pomoActionBtn" onclick="togglePomoTimer()">
+          PAUSE
+        </button>
+<button class="px-4 py-2 rounded-full bg-[#090a0c] text-[#8A8D91] hover:text-white font-ndot text-[9px] font-bold uppercase tracking-widest border border-white/10 hover:border-white/20 transition-colors" onclick="resetPomoTimer()">
+          RESET
+        </button>
+<button class="px-2.5 py-2 rounded-full bg-[#D71921]/15 text-[#FF2E2E] hover:bg-[#D71921]/30 font-ndot text-[9px] font-bold uppercase border border-[#D71921]/30 transition-colors" onclick="triggerGlyphEffect('pomo')" title="Trigger Finish Flash">
+          TEST FLASH
+        </button>
+</div>
+</div>
+<!-- VIEW 2: NOW PLAYING MEDIA (Hidden Initially) -->
+<div class="w-full hidden flex items-center justify-between" id="viewMedia">
+<div class="flex items-center gap-4 flex-1 min-w-0 pr-4">
+<!-- Vinyl Reel Simulation -->
+<div class="w-14 h-14 rounded-nothing-widget bg-[#090a0c] border border-white/15 flex items-center justify-center relative overflow-hidden shrink-0">
+<div class="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center animate-spin" style="animation-duration: 5s;">
+<div class="w-4 h-4 rounded-full border border-white/50 flex items-center justify-center">
+<div class="w-1.5 h-1.5 rounded-full nothing-red-led"></div>
+</div>
+</div>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="text-sm font-sans font-bold text-white truncate">Good Lies</span>
+<span class="font-ndot text-[7px] text-[#4DA3FF] bg-[#4DA3FF]/10 px-2 py-0.2 rounded-full border border-[#4DA3FF]/30">96KHZ FLAC</span>
+</div>
+<span class="text-xs text-[#8A8D91] font-mono truncate">Overmono — Nothing Ear (2) Low Latency</span>
+<!-- Scrubber -->
+<div class="flex items-center gap-2 mt-1.5 w-full">
+<span class="font-ndot text-[8px] text-[#8A8D91]">02:18</span>
+<div class="flex-1 bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-white h-full rounded-full w-[64%] glyph-light"></div>
+</div>
+<span class="font-ndot text-[8px] text-[#8A8D91]">03:36</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded-full bg-[#090a0c] border border-white/10 flex items-center justify-center text-[#8A8D91] hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[17px]">skip_previous</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center hover:opacity-90 transition-opacity shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-[18px]">pause</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-[#090a0c] border border-white/10 flex items-center justify-center text-[#8A8D91] hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[17px]">skip_next</span>
+</button>
+</div>
+</div>
+<!-- VIEW 3: PROTOCOL AGENDA (Hidden Initially) -->
+<div class="w-full hidden flex items-center justify-between" id="viewAgenda">
+<div class="flex items-center gap-4 flex-1">
+<div class="w-1.5 h-12 rounded-full nothing-red-led shrink-0"></div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-ndot text-xs font-bold text-white">UPCOMING PROTOCOL // 11:30</span>
+<span class="font-ndot text-[7px] px-2 py-0.5 rounded-full bg-[#D71921]/20 text-[#FF2E2E] border border-[#D71921]/40 font-bold">NEXT IN 48M</span>
+</div>
+<span class="text-sm font-sans font-semibold text-white mt-0.5">Core Plasma Architecture &amp; Glyph Sync</span>
+<span class="font-ndot text-[8px] text-[#8A8D91]">LAB 04 • NOTHING TOKYO HARDWARE DESK</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-full bg-white text-black font-ndot text-[8px] font-bold tracking-wider uppercase">
+          JOIN PROTOCOL
+        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- 6-Hour Atmosphere Widget (Weather Glyphs) -->
+<div class="smoked-glass rounded-nothing-card p-4 flex flex-col gap-2.5 shadow-2xl focus-mode-hideable">
+<div class="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-white">cloud_queue</span>
+<span class="font-ndot text-[10px] font-bold tracking-[0.2em] text-white uppercase">ATMOSPHERE FORECAST // 6-HR</span>
+</div>
+<span class="font-ndot text-[8px] text-[#8A8D91]">PRECIPITATION PEAK: 16:00</span>
+</div>
+<div class="grid grid-cols-6 gap-2">
+<!-- 11:00 -->
+<div class="bg-[#090a0c] p-2.5 rounded-nothing-widget border border-white/[0.06] flex flex-col items-center gap-1.5 text-center">
+<span class="font-ndot text-[8px] text-[#8A8D91]">11:00</span>
+<span class="material-symbols-outlined text-[18px] text-white">wb_sunny</span>
+<span class="font-ndot text-sm font-bold text-white">22°</span>
+<span class="font-ndot text-[7px] text-[#8A8D91]">0%</span>
+</div>
+<!-- 12:00 Active Current Time -->
+<div class="bg-white text-black p-2.5 rounded-nothing-widget flex flex-col items-center gap-1.5 text-center shadow-[0_0_16px_rgba(255,255,255,0.4)]">
+<span class="font-ndot text-[8px] font-bold text-black">12:00</span>
+<span class="material-symbols-outlined text-[18px] text-black">wb_sunny</span>
+<span class="font-ndot text-sm font-bold text-black">23°</span>
+<span class="font-ndot text-[7px] font-bold text-black">0%</span>
+</div>
+<!-- 13:00 -->
+<div class="bg-[#090a0c] p-2.5 rounded-nothing-widget border border-white/[0.06] flex flex-col items-center gap-1.5 text-center">
+<span class="font-ndot text-[8px] text-[#8A8D91]">13:00</span>
+<span class="material-symbols-outlined text-[18px] text-white/80">partly_cloudy_day</span>
+<span class="font-ndot text-sm font-bold text-white">23°</span>
+<span class="font-ndot text-[7px] text-[#8A8D91]">5%</span>
+</div>
+<!-- 14:00 -->
+<div class="bg-[#090a0c] p-2.5 rounded-nothing-widget border border-white/[0.06] flex flex-col items-center gap-1.5 text-center">
+<span class="font-ndot text-[8px] text-[#8A8D91]">14:00</span>
+<span class="material-symbols-outlined text-[18px] text-white/80">cloud</span>
+<span class="font-ndot text-sm font-bold text-white">21°</span>
+<span class="font-ndot text-[7px] text-[#8A8D91]">12%</span>
+</div>
+<!-- 15:00 -->
+<div class="bg-[#090a0c] p-2.5 rounded-nothing-widget border border-white/[0.06] flex flex-col items-center gap-1.5 text-center">
+<span class="font-ndot text-[8px] text-[#8A8D91]">15:00</span>
+<span class="material-symbols-outlined text-[18px] text-white">rainy</span>
+<span class="font-ndot text-sm font-bold text-white">19°</span>
+<span class="font-ndot text-[7px] text-white font-bold">45%</span>
+</div>
+<!-- 16:00 -->
+<div class="bg-[#090a0c] p-2.5 rounded-nothing-widget border border-white/[0.06] flex flex-col items-center gap-1.5 text-center">
+<span class="font-ndot text-[8px] text-[#8A8D91]">16:00</span>
+<span class="material-symbols-outlined text-[18px] text-white">rainy</span>
+<span class="font-ndot text-sm font-bold text-white">18°</span>
+<span class="font-ndot text-[7px] text-white font-bold">60%</span>
+</div>
+</div>
+</div>
+<!-- AI Runtime Matrix Input Bar -->
+<div class="smoked-glass rounded-nothing-card p-3.5 flex flex-col gap-2.5 shadow-2xl focus-mode-hideable">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-white">neurology</span>
+<span class="font-ndot text-[9px] font-bold tracking-[0.2em] text-white uppercase">NOTHING AI RUNTIME</span>
+<span class="w-1.5 h-1.5 rounded-full bg-white glyph-light"></span>
+</div>
+<div class="flex items-center gap-2 font-ndot text-[8px] text-[#8A8D91]">
+<span>CTX: 128K</span>
+<span class="text-white font-bold">14.2 TOK/S</span>
+</div>
+</div>
+<!-- Model Pills -->
+<div class="flex items-center gap-2 flex-wrap font-ndot text-[8px]">
+<button class="px-3 py-1 rounded-full bg-white text-black font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-[0_0_10px_rgba(255,255,255,0.35)]">
+<span class="w-1.5 h-1.5 rounded-full bg-black"></span>CLAUDE 3.5 SONNET
+</button>
+<button class="px-3 py-1 rounded-full bg-[#090a0c] hover:bg-white/5 text-[#8A8D91] hover:text-white font-semibold uppercase tracking-widest flex items-center gap-1.5 border border-white/10 transition-colors">
+<span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>GEMINI 1.5 PRO
+</button>
+<button class="px-3 py-1 rounded-full bg-[#090a0c] hover:bg-white/5 text-[#8A8D91] hover:text-white font-semibold uppercase tracking-widest flex items-center gap-1.5 border border-white/10 transition-colors">
+<span class="w-1.5 h-1.5 rounded-full bg-white/30"></span>LLAMA 3.1
+</button>
+</div>
+<!-- Input Bar -->
+<div class="w-full bg-[#090a0c] rounded-full px-4 py-1.5 flex items-center justify-between border border-white/15 focus-within:border-white/50 transition-colors">
+<div class="flex items-center gap-2.5 flex-1 min-w-0">
+<span class="material-symbols-outlined text-[16px] text-white">terminal</span>
+<input class="w-full bg-transparent border-none outline-none text-xs text-white placeholder-[#8A8D91]/60 font-mono" placeholder="Query Nothing OS matrix or execute protocol (/)..." type="text"/>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-white/10 font-ndot text-[8px] text-white font-bold tracking-wider ml-2">RETURN ↵</span>
+</div>
+</div>
+</div>
+<!-- ==================== RIGHT COLUMN: HARDWARE TOGGLES, FOCUS CONTROL & CALENDAR ==================== -->
+<div class="lg:col-span-3 flex flex-col gap-3.5 justify-between">
+<!-- Quick System I/O Toggles (With 5. Dedicated FOCUS MODE Pill) -->
+<div class="smoked-glass rounded-nothing-card p-3.5 flex flex-col gap-2.5 shadow-2xl focus-mode-hideable">
+<div class="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-white">tune</span>
+<span class="font-ndot text-[10px] font-bold tracking-[0.2em] text-white uppercase">SYSTEM I/O TOGGLES</span>
+</div>
+<span class="font-ndot text-[8px] text-white bg-white/10 px-2 py-0.5 rounded-full">NOTHING OS 3.0</span>
+</div>
+<!-- Grid with Prominent Focus Mode & Hardware Switched -->
+<div class="grid grid-cols-2 gap-2 font-ndot">
+<!-- 5. ONE-CLICK FOCUS MODE TOGGLE (Featured) -->
+<button class="col-span-2 p-2.5 rounded-nothing-widget bg-[#090a0c] border border-white/20 flex items-center justify-between hover:border-white transition-all group shadow-sm" id="cardFocusBtn" onclick="toggleFocusMode()">
+<div class="flex items-center gap-2.5">
+<div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors">
+<span class="material-symbols-outlined text-[15px]">center_focus_strong</span>
+</div>
+<div class="flex flex-col text-left">
+<span class="text-[9px] font-bold text-white">ONE-CLICK FOCUS</span>
+<span class="text-[7px] text-[#8A8D91]">ISOLATE CLOCK &amp; NOTES</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10">
+<span class="w-2 h-2 rounded-full bg-white/30" id="cardFocusLed"></span>
+<span class="text-[8px] font-bold text-[#8A8D91]" id="cardFocusStatus">OFF</span>
+</div>
+</button>
+<!-- Wi-Fi Toggle -->
+<button class="p-2 rounded-nothing-widget bg-[#090a0c] border border-white/10 flex items-center justify-between hover:bg-white/[0.04] transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-white">wifi</span>
+<span class="text-[8px] font-bold text-white">WI-FI 6E</span>
+</div>
+<span class="w-2 h-2 rounded-full glyph-light"></span>
+</button>
+<!-- Bluetooth Toggle -->
+<button class="p-2 rounded-nothing-widget bg-[#090a0c] border border-white/10 flex items-center justify-between hover:bg-white/[0.04] transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-white">bluetooth</span>
+<span class="text-[8px] font-bold text-white">BT 5.3</span>
+</div>
+<span class="w-2 h-2 rounded-full glyph-light"></span>
+</button>
+<!-- Glyph Torch Light -->
+<button class="p-2 rounded-nothing-widget bg-[#090a0c] border border-white/10 flex items-center justify-between hover:bg-white/[0.04] transition-colors" onclick="triggerGlyphEffect('notif')">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-white">light_mode</span>
+<span class="text-[8px] font-bold text-white">GLYPH PULSE</span>
+</div>
+<span class="w-2 h-2 rounded-full glyph-light"></span>
+</button>
+<!-- DND Switch -->
+<button class="p-2 rounded-nothing-widget bg-[#090a0c] border border-white/[0.06] flex items-center justify-between hover:bg-white/[0.04] transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-[#8A8D91]">do_not_disturb_on</span>
+<span class="text-[8px] font-bold text-[#8A8D91]">DND</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-white/20"></span>
+</button>
+</div>
+</div>
+<!-- Iteration 4 Glyph Simulator Control Rack (Interactive Hardware Testing) -->
+<div class="smoked-glass rounded-nothing-card p-3.5 flex flex-col gap-2 shadow-2xl focus-mode-hideable">
+<div class="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full nothing-blue-led"></span>
+<span class="font-ndot text-[10px] font-bold tracking-[0.2em] text-white uppercase">GLYPH AMBIENT LAB</span>
+</div>
+<span class="font-ndot text-[8px] text-[#4DA3FF]">PERIMETER I/O</span>
+</div>
+<p class="text-[9px] font-mono text-[#8A8D91]">Live hardware perimeter simulation triggers:</p>
+<div class="grid grid-cols-3 gap-1.5 pt-1">
+<button class="p-2 rounded-nothing-widget bg-[#090a0c] hover:bg-[#4DA3FF]/15 border border-[#4DA3FF]/30 text-center transition-all flex flex-col items-center gap-1" onclick="triggerGlyphEffect('charging')">
+<span class="w-2 h-2 rounded-full nothing-blue-led"></span>
+<span class="font-ndot text-[7px] text-[#4DA3FF] font-bold">CHARGE CYAN</span>
+</button>
+<button class="p-2 rounded-nothing-widget bg-[#090a0c] hover:bg-white/15 border border-white/20 text-center transition-all flex flex-col items-center gap-1" onclick="triggerGlyphEffect('notif')">
+<span class="w-2 h-2 rounded-full bg-white glyph-light"></span>
+<span class="font-ndot text-[7px] text-white font-bold">NOTIF PULSE</span>
+</button>
+<button class="p-2 rounded-nothing-widget bg-[#090a0c] hover:bg-[#D71921]/20 border border-[#D71921]/40 text-center transition-all flex flex-col items-center gap-1" onclick="triggerGlyphEffect('pomo')">
+<span class="w-2 h-2 rounded-full nothing-red-led"></span>
+<span class="font-ndot text-[7px] text-[#FF2E2E] font-bold">POMO FLASH</span>
+</button>
+</div>
+</div>
+<!-- October Matrix Calendar Card (Dotted Date Ring) -->
+<div class="smoked-glass rounded-nothing-card p-3.5 flex flex-col gap-2 shadow-2xl focus-mode-hideable">
+<div class="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+<span class="font-ndot text-[10px] font-bold tracking-[0.2em] text-white uppercase">OCTOBER 2024</span>
+<span class="font-ndot text-[8px] text-white font-bold">W43 // Q4</span>
+</div>
+<div class="grid grid-cols-7 gap-1 text-center font-ndot text-[7px] text-[#8A8D91] pt-0.5">
+<span>MO</span><span>TU</span><span>WE</span><span>TH</span><span>FR</span><span>SA</span><span>SU</span>
+</div>
+<div class="grid grid-cols-7 gap-1 text-center font-ndot text-[9px] text-white/70">
+<span class="text-white/20">30</span><span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span>
+<span>07</span><span>08</span><span>09</span><span>10</span><span>11</span><span>12</span><span>13</span>
+<span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
+<span>21</span><span>22</span><span>23</span>
+<!-- Active Current Date -->
+<div class="relative w-5 h-5 mx-auto rounded-full bg-white text-black flex items-center justify-center font-bold text-[9px] shadow-[0_0_10px_rgba(255,255,255,0.7)]">
+24
+<span class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full nothing-red-led"></span>
+</div>
+<span>25</span><span>26</span><span>27</span>
+<span>28</span><span>29</span><span>30</span><span>31</span><span class="text-white/20">01</span><span class="text-white/20">02</span><span class="text-white/20">03</span>
+</div>
+</div>
+<!-- Utilities Quick Rack -->
+<div class="smoked-glass rounded-nothing-card p-3 flex items-center justify-between shadow-2xl focus-mode-hideable">
+<button class="flex-1 py-1.5 px-2 rounded-nothing-widget bg-[#090a0c] hover:bg-white/[0.08] border border-white/10 text-center transition-colors flex items-center justify-center gap-1.5" title="CLI Terminal">
+<span class="material-symbols-outlined text-[13px] text-white">terminal</span>
+<span class="font-ndot text-[8px] font-bold text-white">CLI</span>
+</button>
+<div class="w-1.5"></div>
+<button class="flex-1 py-1.5 px-2 rounded-nothing-widget bg-[#090a0c] hover:bg-white/[0.08] border border-white/10 text-center transition-colors flex items-center justify-center gap-1.5" title="Code Editor">
+<span class="material-symbols-outlined text-[13px] text-white">code_blocks</span>
+<span class="font-ndot text-[8px] font-bold text-white">IDE</span>
+</button>
+<div class="w-1.5"></div>
+<button class="flex-1 py-1.5 px-2 rounded-nothing-widget bg-[#090a0c] hover:bg-white/[0.08] border border-white/10 text-center transition-colors flex items-center justify-center gap-1.5" onclick="toggleFocusMode()" title="Toggle Focus Mode">
+<span class="material-symbols-outlined text-[13px] text-[#4DA3FF]">center_focus_strong</span>
+<span class="font-ndot text-[8px] font-bold text-white">FOCUS</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- ==================== CLEAN FLOATING BOTTOM DOCK ==================== -->
+<div class="fixed bottom-3.5 left-1/2 -translate-x-1/2 z-40">
+<div class="bg-[#090a0c]/85 backdrop-blur-2xl border border-white/15 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-[0_12px_40px_rgba(0,0,0,0.85)]">
+<!-- Camera Glyph -->
+<button class="w-10 h-10 rounded-full bg-white/[0.05] hover:bg-white/15 border border-white/[0.08] flex items-center justify-center text-white transition-all hover:-translate-y-1 relative group" title="Camera">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+<span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</button>
+<!-- Terminal Glyph -->
+<button class="w-10 h-10 rounded-full bg-white/[0.05] hover:bg-white/15 border border-white/[0.08] flex items-center justify-center text-white transition-all hover:-translate-y-1 relative group" title="Terminal">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+<span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</button>
+<!-- Zen Browser Glyph -->
+<button class="w-10 h-10 rounded-full bg-white/[0.05] hover:bg-white/15 border border-white/[0.08] flex items-center justify-center text-white transition-all hover:-translate-y-1 relative group" title="Browser">
+<span class="material-symbols-outlined text-[18px]">travel_explore</span>
+<span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</button>
+<!-- Active App: Antigravity IDE (With Signature Nothing Red Dot indicator) -->
+<button class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center transition-all hover:-translate-y-1 relative shadow-[0_0_12px_rgba(255,255,255,0.5)]" title="Antigravity Studio">
+<span class="material-symbols-outlined text-[18px]">code_blocks</span>
+<span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full nothing-red-led"></span>
+</button>
+<!-- File Explorer Glyph -->
+<button class="w-10 h-10 rounded-full bg-white/[0.05] hover:bg-white/15 border border-white/[0.08] flex items-center justify-center text-white transition-all hover:-translate-y-1 relative group" title="Files">
+<span class="material-symbols-outlined text-[18px]">folder_open</span>
+<span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</button>
+<!-- 5. Focus Mode Dock Button -->
+<button class="w-10 h-10 rounded-full bg-white/[0.05] hover:bg-white/20 border border-white/[0.12] flex items-center justify-center text-[#4DA3FF] transition-all hover:-translate-y-1 relative group" id="dockFocusBtn" onclick="toggleFocusMode()" title="One-Click Focus Mode">
+<span class="material-symbols-outlined text-[18px]" id="dockFocusIcon">center_focus_strong</span>
+<span class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-white/40" id="dockFocusLed"></span>
+</button>
+<!-- Hardware Insights -->
+<button class="w-10 h-10 rounded-full bg-white/[0.05] hover:bg-white/15 border border-white/[0.08] flex items-center justify-center text-white transition-all hover:-translate-y-1 relative group" title="Diagnostics">
+<span class="material-symbols-outlined text-[18px]">insights</span>
+<span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</button>
+<div class="h-5 w-px bg-white/15 mx-0.5"></div>
+<!-- System Settings -->
+<button class="w-10 h-10 rounded-full bg-white/[0.05] hover:bg-white/15 border border-white/[0.08] flex items-center justify-center text-[#8A8D91] hover:text-white transition-all hover:-translate-y-1" title="Settings">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+</button>
+</div>
+</div>
+<!-- ==================== SIGNATURE BEHAVIORS JS ENGINE ==================== -->
+<script>
+  // 1. GLYPH-STYLE AMBIENT BORDER LIGHT CONTROLLER
+  let glyphTimeout = null;
+  function triggerGlyphEffect(type) {
+    const perimeter = document.getElementById('glyphPerimeter');
+    const statusBar = document.getElementById('glyphStatusBar');
+    const glyphText = document.getElementById('glyphStateText');
+    if (!perimeter) return;
+
+    // Clear previous classes & timeouts
+    perimeter.classList.remove('glyph-state-charging', 'glyph-state-notif', 'glyph-state-pomored');
+    if (glyphTimeout) clearTimeout(glyphTimeout);
+
+    if (type === 'charging') {
+      perimeter.classList.add('glyph-state-charging');
+      if (statusBar) statusBar.style.backgroundColor = '#4DA3FF';
+      if (glyphText) glyphText.textContent = 'GLYPH // CHARGING 68W';
+      glyphTimeout = setTimeout(() => {
+        perimeter.classList.remove('glyph-state-charging');
+        if (statusBar) statusBar.style.backgroundColor = '#FFFFFF';
+        if (glyphText) glyphText.textContent = 'GLYPH // ACTIVE';
+      }, 7000);
+    } else if (type === 'notif') {
+      perimeter.classList.add('glyph-state-notif');
+      if (statusBar) statusBar.style.backgroundColor = '#FFFFFF';
+      if (glyphText) glyphText.textContent = 'GLYPH // NOTIFICATION';
+      glyphTimeout = setTimeout(() => {
+        perimeter.classList.remove('glyph-state-notif');
+        if (glyphText) glyphText.textContent = 'GLYPH // ACTIVE';
+      }, 2500);
+    } else if (type === 'pomo') {
+      perimeter.classList.add('glyph-state-pomored');
+      if (statusBar) statusBar.style.backgroundColor = '#D71921';
+      if (glyphText) glyphText.textContent = 'GLYPH // SPRINT COMPLETE';
+      glyphTimeout = setTimeout(() => {
+        perimeter.classList.remove('glyph-state-pomored');
+        if (statusBar) statusBar.style.backgroundColor = '#FFFFFF';
+        if (glyphText) glyphText.textContent = 'GLYPH // ACTIVE';
+      }, 3400);
+    }
+  }
+
+  // 2. DOT-DISSOLVE TRANSITION ENGINE
+  function executeDotDissolve(container, updateCallback) {
+    if (!container) {
+      updateCallback();
+      return;
+    }
+    container.classList.remove('is-dot-dissolving-in');
+    container.classList.add('is-dot-dissolving-out');
+
+    setTimeout(() => {
+      updateCallback();
+      container.classList.remove('is-dot-dissolving-out');
+      container.classList.add('is-dot-dissolving-in');
+      setTimeout(() => {
+        container.classList.remove('is-dot-dissolving-in');
+      }, 300);
+    }, 200);
+  }
+
+  // 3. UNIFIED "NOW // CONTEXT" CARD LOGIC
+  let currentNowMode = 'pomodoro';
+  function switchNowMode(mode) {
+    if (currentNowMode === mode) return;
+    currentNowMode = mode;
+
+    const container = document.getElementById('nowContentContainer');
+    const pBadge = document.getElementById('nowPriorityBadge');
+    const pDot = document.getElementById('nowStatusDot');
+
+    const tabPomo = document.getElementById('tabBtnPomo');
+    const tabMedia = document.getElementById('tabBtnMedia');
+    const tabAgenda = document.getElementById('tabBtnAgenda');
+
+    // Update Tabs UI
+    [tabPomo, tabMedia, tabAgenda].forEach(btn => {
+      btn.className = "px-2.5 py-1 rounded-full text-[8px] font-ndot font-semibold tracking-wider text-[#8A8D91] hover:text-white transition-all";
+    });
+
+    executeDotDissolve(container, () => {
+      const vPomo = document.getElementById('viewPomodoro');
+      const vMedia = document.getElementById('viewMedia');
+      const vAgenda = document.getElementById('viewAgenda');
+
+      vPomo.classList.add('hidden');
+      vMedia.classList.add('hidden');
+      vAgenda.classList.add('hidden');
+
+      if (mode === 'pomodoro') {
+        vPomo.classList.remove('hidden');
+        tabPomo.className = "px-2.5 py-1 rounded-full text-[8px] font-ndot font-bold tracking-wider transition-all bg-white text-black shadow-[0_0_8px_rgba(255,255,255,0.4)]";
+        pBadge.textContent = "PRIORITY: P1_FOCUS";
+        pDot.className = "w-2 h-2 rounded-full nothing-red-led";
+      } else if (mode === 'media') {
+        vMedia.classList.remove('hidden');
+        tabMedia.className = "px-2.5 py-1 rounded-full text-[8px] font-ndot font-bold tracking-wider transition-all bg-white text-black shadow-[0_0_8px_rgba(255,255,255,0.4)]";
+        pBadge.textContent = "PRIORITY: P2_BACKGROUND";
+        pDot.className = "w-2 h-2 rounded-full nothing-blue-led";
+      } else if (mode === 'agenda') {
+        vAgenda.classList.remove('hidden');
+        tabAgenda.className = "px-2.5 py-1 rounded-full text-[8px] font-ndot font-bold tracking-wider transition-all bg-white text-black shadow-[0_0_8px_rgba(255,255,255,0.4)]";
+        pBadge.textContent = "PRIORITY: P3_SCHEDULE";
+        pDot.className = "w-2 h-2 rounded-full bg-white glyph-light";
+      }
+    });
+  }
+
+  // 4. DAY PROGRESS HAIRLINE GENERATOR (48 Discrete Micro-Ticks)
+  function buildDayHairline() {
+    const container = document.getElementById('dayHairlineTicks');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const totalTicks = 48;
+    // Calculate current time fraction
+    const now = new Date();
+    const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
+    const dayRatio = minutesSinceMidnight / 1440;
+    const activeCount = Math.round(dayRatio * totalTicks);
+
+    for (let i = 0; i < totalTicks; i++) {
+      const tick = document.createElement('div');
+      tick.className = 'day-tick h-2.5 flex-1 rounded-[1px] cursor-pointer';
+      
+      if (i < activeCount) {
+        // High-contrast filled tick (electric-blue / white)
+        if (i === activeCount - 1) {
+          tick.style.backgroundColor = '#FFFFFF';
+          tick.style.boxShadow = '0 0 6px rgba(255,255,255,0.85)';
+        } else {
+          tick.style.backgroundColor = '#4DA3FF';
+          tick.style.opacity = 0.85 + (i / activeCount) * 0.15;
+        }
+      } else {
+        // Dim obsidian tick
+        tick.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+      }
+      tick.title = `TICK ${i + 1}/${totalTicks} (~${Math.round((i/totalTicks)*24)}:00)`;
+      container.appendChild(tick);
+    }
+  }
+
+  // 5. ONE-CLICK FOCUS MODE TOGGLE
+  let isFocusModeActive = false;
+  function toggleFocusMode() {
+    isFocusModeActive = !isFocusModeActive;
+    const body = document.body;
+    const navBtn = document.getElementById('navFocusBtn');
+    const navLed = document.getElementById('navFocusLed');
+    const cardLed = document.getElementById('cardFocusLed');
+    const cardStatus = document.getElementById('cardFocusStatus');
+    const dockBtn = document.getElementById('dockFocusBtn');
+    const dockLed = document.getElementById('dockFocusLed');
+
+    if (isFocusModeActive) {
+      body.classList.add('focus-mode-active');
+      triggerGlyphEffect('notif');
+
+      // Nav UI
+      if (navBtn) navBtn.classList.add('bg-white', 'text-black', 'shadow-[0_0_12px_rgba(255,255,255,0.5)]');
+      if (navLed) navLed.className = 'w-1.5 h-1.5 rounded-full nothing-red-led';
+      
+      // Card UI
+      if (cardLed) cardLed.className = 'w-2 h-2 rounded-full nothing-red-led';
+      if (cardStatus) {
+        cardStatus.textContent = 'ACTIVE';
+        cardStatus.className = 'text-[8px] font-bold text-white';
+      }
+
+      // Dock UI
+      if (dockBtn) dockBtn.classList.add('bg-white', 'text-black');
+      if (dockLed) dockLed.className = 'absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full nothing-red-led';
+
+    } else {
+      body.classList.remove('focus-mode-active');
+
+      // Nav UI
+      if (navBtn) navBtn.classList.remove('bg-white', 'text-black', 'shadow-[0_0_12px_rgba(255,255,255,0.5)]');
+      if (navLed) navLed.className = 'w-1.5 h-1.5 rounded-full bg-white/30';
+
+      // Card UI
+      if (cardLed) cardLed.className = 'w-2 h-2 rounded-full bg-white/30';
+      if (cardStatus) {
+        cardStatus.textContent = 'OFF';
+        cardStatus.className = 'text-[8px] font-bold text-[#8A8D91]';
+      }
+
+      // Dock UI
+      if (dockBtn) dockBtn.classList.remove('bg-white', 'text-black');
+      if (dockLed) dockLed.className = 'absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-white/40';
+    }
+  }
+
+  // Pomodoro Mini Timer State
+  let pomoSeconds = 21 * 60 + 45;
+  let pomoRunning = true;
+  let pomoInterval = null;
+
+  function togglePomoTimer() {
+    const btn = document.getElementById('pomoActionBtn');
+    pomoRunning = !pomoRunning;
+    if (btn) btn.textContent = pomoRunning ? 'PAUSE' : 'START';
+  }
+
+  function resetPomoTimer() {
+    pomoSeconds = 25 * 60;
+    updatePomoDisplay();
+  }
+
+  function updatePomoDisplay() {
+    const el = document.getElementById('pomoCountdown');
+    if (!el) return;
+    const m = String(Math.floor(pomoSeconds / 60)).padStart(2, '0');
+    const s = String(pomoSeconds % 60).padStart(2, '0');
+    el.textContent = `${m}:${s}`;
+    if (pomoSeconds === 0) {
+      triggerGlyphEffect('pomo');
+      pomoSeconds = 25 * 60;
+    }
+  }
+
+  function clearScratchpad() {
+    const card = document.getElementById('scratchpadCard');
+    if (card) {
+      executeDotDissolve(card, () => {
+        const p = card.querySelector('p');
+        if (p) p.innerHTML = '<span class="text-white font-bold font-ndot">&gt;&gt;</span> Buffer flushed. Ready for input...';
+      });
+    }
+  }
+
+  // Micro Real-time Clock Sync with Dot-Dissolve Minute Change
+  (function() {
+    let lastMinute = -1;
+    function syncClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const mins = now.getMinutes();
+      const secs = String(now.getSeconds()).padStart(2, '0');
+      const minsFormatted = String(mins).padStart(2, '0');
+      const heroClock = document.getElementById('hero-clock');
+      const heroClockWrapper = document.getElementById('heroClockWrapper');
+      const navTime = document.getElementById('nav-time');
+      const heroSecs = document.getElementById('heroSeconds');
+      const displayHours = hours % 12 || 12;
+
+      if (heroSecs) heroSecs.textContent = `SEC ${secs}`;
+
+      if (lastMinute !== mins) {
+        lastMinute = mins;
+        buildDayHairline();
+        if (heroClockWrapper && heroClock) {
+          executeDotDissolve(heroClockWrapper, () => {
+            heroClock.textContent = displayHours + ':' + minsFormatted;
+          });
+        }
+      } else {
+        if (heroClock && !heroClock.textContent.includes(':')) {
+          heroClock.textContent = displayHours + ':' + minsFormatted;
+        }
+      }
+
+      if (navTime) {
+        navTime.textContent = displayHours + ':' + minsFormatted;
+      }
+
+      // Decrement pomo if running
+      if (pomoRunning && pomoSeconds > 0) {
+        pomoSeconds--;
+        updatePomoDisplay();
+      }
+    }
+
+    buildDayHairline();
+    setInterval(syncClock, 1000);
+    syncClock();
+  })();
+</script>
+</body></html>

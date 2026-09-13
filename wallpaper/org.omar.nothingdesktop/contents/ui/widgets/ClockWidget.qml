@@ -114,22 +114,31 @@ Item {
                 }
             }
 
-            // Day-Progress Hairline: Row of dot-matrix ticks
+            // Day-Progress Hairline: Row of 48 discrete micro-ticks (Stitch Iteration 4)
             Row {
                 id: dayHairline
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: 3
-                topPadding: 4
+                topPadding: 6
+
+                readonly property int activeTickIndex: Math.floor(root.dayProgress * 48)
 
                 Repeater {
-                    model: 48 // 48 ticks = half-hour increments throughout 24 hours
+                    model: 48 // 48 ticks = 30-minute intervals across 24h
                     Rectangle {
+                        id: tickRect
                         width: 3
-                        height: (index % 12 === 0) ? 5 : (index % 2 === 0 ? 3 : 2)
+                        height: (index % 12 === 0) ? 6 : (index % 2 === 0 ? 4 : 3)
                         radius: 1
                         anchors.verticalCenter: parent.verticalCenter
-                        color: (index / 48.0) <= root.dayProgress ? root.accentColor : Theme.outline
-                        opacity: (index / 48.0) <= root.dayProgress ? 0.95 : 0.25
+                        
+                        // Active lead tick shines pure white, previous ticks glow in accentColor, future ticks in muted outline
+                        color: (index === dayHairline.activeTickIndex)
+                            ? "#FFFFFF"
+                            : ((index < dayHairline.activeTickIndex) ? root.accentColor : Theme.outline)
+                        opacity: (index === dayHairline.activeTickIndex)
+                            ? 1.0
+                            : ((index < dayHairline.activeTickIndex) ? 0.90 : 0.20)
 
                         Behavior on color { ColorAnimation { duration: 300 } }
                         Behavior on opacity { NumberAnimation { duration: 300 } }

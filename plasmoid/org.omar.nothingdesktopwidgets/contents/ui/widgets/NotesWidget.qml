@@ -103,16 +103,18 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            noteEditor.text = "";
-                            root.notesText = "";
-                            root.notesUpdated("");
-                            root.saveToDisk("");
+                            noteDissolve.swapContent(function() {
+                                noteEditor.text = "";
+                                root.notesText = "";
+                                root.notesUpdated("");
+                                root.saveToDisk("");
+                            });
                         }
                     }
                 }
             }
 
-            // Editable Text Area
+            // Editable Text Area with DotDissolve on flush
             Rectangle {
                 width: parent.width
                 height: parent.height - 36
@@ -124,25 +126,32 @@ Item {
 
                 Behavior on border.color { ColorAnimation { duration: Theme.durShort } }
 
-                QQC2.ScrollView {
+                DotDissolveTransition {
+                    id: noteDissolve
                     anchors.fill: parent
                     anchors.margins: 10
+                    dotColor: root.accentColor
+                    duration: 320
 
-                    QQC2.TextArea {
-                        id: noteEditor
-                        text: root.notesText
-                        color: Theme.fg
-                        font.family: Theme.fontUi
-                        font.pixelSize: 12
-                        wrapMode: TextEdit.Wrap
-                        background: null
-                        selectByMouse: true
-                        placeholderText: "// Type quick notes, checklist items, or code snippets here..."
-                        placeholderTextColor: Theme.fgFaint
+                    QQC2.ScrollView {
+                        anchors.fill: parent
 
-                        onTextChanged: {
-                            if (noteEditor.text !== root.notesText) {
-                                saveDebounce.restart();
+                        QQC2.TextArea {
+                            id: noteEditor
+                            text: root.notesText
+                            color: Theme.fg
+                            font.family: Theme.fontUi
+                            font.pixelSize: 12
+                            wrapMode: TextEdit.Wrap
+                            background: null
+                            selectByMouse: true
+                            placeholderText: "// Type quick notes, checklist items, or code snippets here..."
+                            placeholderTextColor: Theme.fgFaint
+
+                            onTextChanged: {
+                                if (noteEditor.text !== root.notesText) {
+                                    saveDebounce.restart();
+                                }
                             }
                         }
                     }
