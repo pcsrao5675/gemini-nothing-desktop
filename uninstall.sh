@@ -93,6 +93,8 @@ if command -v systemctl >/dev/null 2>&1; then
     systemctl --user disable gemini-screenshot.service 2>/dev/null || true
     systemctl --user stop gemini-assistant.service 2>/dev/null || true
     systemctl --user disable gemini-assistant.service 2>/dev/null || true
+    systemctl --user stop gemini-notifications.service 2>/dev/null || true
+    systemctl --user disable gemini-notifications.service 2>/dev/null || true
     systemctl --user daemon-reload 2>/dev/null || true
 fi
 
@@ -172,7 +174,19 @@ PYEOF
     fi
 fi
 
-# 4. Clean shortcut configuration and rebuild sycoca
+# 4. Restore Stock Plasma Notification Configuration
+NOTIFY_RC="$XDG_CONFIG_HOME/plasmanotifyrc"
+if [[ -f "$NOTIFY_RC.bak" ]]; then
+    echo "-> Restoring original Plasma notification configuration from backup..."
+    cp "$NOTIFY_RC.bak" "$NOTIFY_RC"
+    rm -f "$NOTIFY_RC.bak"
+elif command -v kwriteconfig6 >/dev/null 2>&1; then
+    echo "-> Resetting Plasma notification configuration to default..."
+    kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupPosition "BottomRight" 2>/dev/null || true
+    kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupTimeout 5000 2>/dev/null || true
+fi
+
+# 5. Clean shortcut configuration and rebuild sycoca
 if command -v kbuildsycoca6 >/dev/null 2>&1; then
     echo "-> Rebuilding KDE sycoca cache..."
     kbuildsycoca6 --noincremental 2>/dev/null || true

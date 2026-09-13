@@ -167,6 +167,12 @@ echo "-> Deploying Daemon microservice to $ASSISTANT_DEST/server.py..."
 cp "$SCRIPT_DIR/daemon/server.py" "$ASSISTANT_DEST/server.py"
 chmod +x "$ASSISTANT_DEST/server.py"
 
+# 4b. Deploy Notification Daemon
+echo "-> Deploying Notification Daemon to $ASSISTANT_DEST/notifications/..."
+mkdir -p "$ASSISTANT_DEST/notifications"
+cp -r "$SCRIPT_DIR/daemon/notifications/"* "$ASSISTANT_DEST/notifications/"
+chmod +x "$ASSISTANT_DEST/notifications/server.py"
+
 # 5. Deploy Toggle Script
 echo "-> Deploying launcher script to $TOGGLE_DEST..."
 cp "$SCRIPT_DIR/bin/gemini-toggle.sh" "$TOGGLE_DEST"
@@ -180,6 +186,7 @@ cp "$SCRIPT_DIR/desktop/gemini-overlay.desktop" "$DESKTOP_DEST"
 echo "-> Deploying systemd services to $SYSTEMD_USER_DIR..."
 cp "$SCRIPT_DIR/daemon/systemd/gemini-screenshot.service" "$SYSTEMD_USER_DIR/gemini-screenshot.service"
 cp "$SCRIPT_DIR/daemon/systemd/gemini-assistant.service" "$SYSTEMD_USER_DIR/gemini-assistant.service"
+cp "$SCRIPT_DIR/daemon/systemd/gemini-notifications.service" "$SYSTEMD_USER_DIR/gemini-notifications.service"
 
 # 8. Merge KWin 6 Window Rules idempotently
 echo "-> Configuring KWin 6 window rules in $KWIN_RULES_FILE..."
@@ -260,11 +267,24 @@ if command -v kbuildsycoca6 >/dev/null 2>&1; then
     kbuildsycoca6 --noincremental 2>/dev/null || true
 fi
 
-# 10. Reload and Enable Systemd Service
+# 10. Configure Plasma Notification Suppression (Reversible)
+echo "-> Configuring Plasma notification popup suppression (backed up to plasmanotifyrc.bak)..."
+if command -v kwriteconfig6 >/dev/null 2>&1; then
+    NOTIFY_RC="$XDG_CONFIG_HOME/plasmanotifyrc"
+    if [[ -f "$NOTIFY_RC" ]] && [[ ! -f "$NOTIFY_RC.bak" ]]; then
+        cp "$NOTIFY_RC" "$NOTIFY_RC.bak"
+    fi
+    # Inhibit Plasma popups cleanly so NothingNotificationDaemon handles all popups
+    kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupPosition "None" 2>/dev/null || true
+    kwriteconfig6 --file plasmanotifyrc --group Notifications --key PopupTimeout 0 2>/dev/null || true
+fi
+
+# 11. Reload and Enable Systemd Services
 if command -v systemctl >/dev/null 2>&1; then
-    echo "-> Reloading systemd user daemon and enabling gemini-screenshot.service..."
+    echo "-> Reloading systemd user daemon and enabling services..."
     systemctl --user daemon-reload 2>/dev/null || true
     systemctl --user enable gemini-screenshot.service 2>/dev/null || true
+    systemctl --user enable --now gemini-notifications.service 2>/dev/null || true
 fi
 
 echo "=== Installation Completed Successfully! ==="
