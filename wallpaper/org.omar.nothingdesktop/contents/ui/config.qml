@@ -39,6 +39,19 @@ Kirigami.FormLayout {
     property alias cfg_showAssistantWave: showWaveCheckBox.checked
     property string cfg_wavePosition: "BottomCenter"
 
+    // New Widgets Properties
+    property alias cfg_showQuickToggles: showQuickTogglesCheckBox.checked
+    property alias cfg_showPomodoro: showPomodoroCheckBox.checked
+    property alias cfg_showWeatherForecast: showWeatherForecastCheckBox.checked
+    property alias cfg_showScreenshots: showScreenshotsCheckBox.checked
+    property alias cfg_showQuickLinks: showQuickLinksCheckBox.checked
+    property alias cfg_showHabits: showHabitsCheckBox.checked
+    property alias cfg_showQuickAsk: showQuickAskCheckBox.checked
+    property alias cfg_showMonthCalendar: showMonthCalendarCheckBox.checked
+    property alias cfg_showNetDisk: showNetDiskCheckBox.checked
+    property alias cfg_showClipboard: showClipboardCheckBox.checked
+    property alias cfg_showAmbientTile: showAmbientTileCheckBox.checked
+
     // Visual Styling Section
     Item { Kirigami.FormData.isSection: true; Kirigami.FormData.label: "Appearance & Themes" }
 
@@ -66,13 +79,13 @@ Kirigami.FormLayout {
         stepSize: 0.05
     }
 
-    // Clock Section
-    Item { Kirigami.FormData.isSection: true; Kirigami.FormData.label: "Clock Widget" }
+    // Core Widgets Section
+    Item { Kirigami.FormData.isSection: true; Kirigami.FormData.label: "Core Desktop Widgets" }
 
     QQC2.CheckBox {
         id: showClockCheckBox
-        Kirigami.FormData.label: "Enable Clock:"
-        text: "Show large dot-matrix digital clock"
+        Kirigami.FormData.label: "Clock:"
+        text: "Large dot-matrix digital clock"
     }
 
     QQC2.CheckBox {
@@ -81,102 +94,108 @@ Kirigami.FormLayout {
         text: "Use 24-hour time notation"
     }
 
-    QQC2.ComboBox {
-        id: clockPosCombo
-        Kirigami.FormData.label: "Clock Placement:"
-        model: ["TopLeft", "TopCenter", "TopRight", "Center", "BottomLeft", "BottomCenter", "BottomRight"]
-        Component.onCompleted: currentIndex = model.indexOf(root.cfg_clockPosition)
-        onActivated: root.cfg_clockPosition = model[currentIndex]
-    }
-
-    // Vitals Section
-    Item { Kirigami.FormData.isSection: true; Kirigami.FormData.label: "System Vitals Widget" }
-
     QQC2.CheckBox {
         id: showVitalsCheckBox
-        Kirigami.FormData.label: "Enable Vitals:"
+        Kirigami.FormData.label: "System Vitals:"
         text: "Display CPU, RAM, Battery, and GPU monitors"
     }
 
-    QQC2.ComboBox {
-        id: vitalsPosCombo
-        Kirigami.FormData.label: "Vitals Placement:"
-        model: ["TopLeft", "TopCenter", "TopRight", "Center", "BottomLeft", "BottomCenter", "BottomRight"]
-        Component.onCompleted: currentIndex = model.indexOf(root.cfg_vitalsPosition)
-        onActivated: root.cfg_vitalsPosition = model[currentIndex]
-    }
-
-    // Media Section
-    Item { Kirigami.FormData.isSection: true; Kirigami.FormData.label: "MPRIS Media Widget" }
-
     QQC2.CheckBox {
         id: showMediaCheckBox
-        Kirigami.FormData.label: "Enable Media Player:"
-        text: "Display interactive MPRIS now-playing card"
+        Kirigami.FormData.label: "Media Player:"
+        text: "Interactive MPRIS now-playing card"
     }
-
-    QQC2.ComboBox {
-        id: mediaPosCombo
-        Kirigami.FormData.label: "Media Placement:"
-        model: ["TopLeft", "TopCenter", "TopRight", "Center", "BottomLeft", "BottomCenter", "BottomRight"]
-        Component.onCompleted: currentIndex = model.indexOf(root.cfg_mediaPosition)
-        onActivated: root.cfg_mediaPosition = model[currentIndex]
-    }
-
-    // Agenda Section
-    Item { Kirigami.FormData.isSection: true; Kirigami.FormData.label: "Agenda Widget" }
 
     QQC2.CheckBox {
         id: showAgendaCheckBox
-        Kirigami.FormData.label: "Enable Agenda:"
-        text: "Show upcoming schedule and events"
+        Kirigami.FormData.label: "Agenda & Schedule:"
+        text: "Upcoming schedule and events list"
     }
 
     QQC2.TextField {
         id: icsPathField
-        Kirigami.FormData.label: "Calendar .ICS File Path:"
+        Kirigami.FormData.label: "Calendar .ICS Path:"
         placeholderText: "/path/to/calendar.ics"
     }
 
-    QQC2.ComboBox {
-        id: agendaPosCombo
-        Kirigami.FormData.label: "Agenda Placement:"
-        model: ["TopLeft", "TopCenter", "TopRight", "Center", "BottomLeft", "BottomCenter", "BottomRight"]
-        Component.onCompleted: currentIndex = model.indexOf(root.cfg_agendaPosition)
-        onActivated: root.cfg_agendaPosition = model[currentIndex]
-    }
-
-    // Quick Notes Section
-    Item { Kirigami.FormData.isSection: true; Kirigami.FormData.label: "Quick Notes Scratchpad" }
-
     QQC2.CheckBox {
         id: showNotesCheckBox
-        Kirigami.FormData.label: "Enable Notes:"
-        text: "Display editable desktop quick notes card"
+        Kirigami.FormData.label: "Quick Notes:"
+        text: "Editable desktop scratchpad with persistent auto-saving"
     }
-
-    QQC2.ComboBox {
-        id: notesPosCombo
-        Kirigami.FormData.label: "Notes Placement:"
-        model: ["TopLeft", "TopCenter", "TopRight", "Center", "BottomLeft", "BottomCenter", "BottomRight"]
-        Component.onCompleted: currentIndex = model.indexOf(root.cfg_notesPosition)
-        onActivated: root.cfg_notesPosition = model[currentIndex]
-    }
-
-    // Assistant Wave Section
-    Item { Kirigami.FormData.isSection: true; Kirigami.FormData.label: "Assistant Wave Indicator" }
 
     QQC2.CheckBox {
         id: showWaveCheckBox
-        Kirigami.FormData.label: "Enable Assistant Wave:"
-        text: "Show reactive 40 FPS sinusoidal wave indicator"
+        Kirigami.FormData.label: "Assistant Wave:"
+        text: "Reactive 40 FPS sinusoidal assistant wave indicator"
     }
 
-    QQC2.ComboBox {
-        id: wavePosCombo
-        Kirigami.FormData.label: "Wave Placement:"
-        model: ["TopLeft", "TopCenter", "TopRight", "Center", "BottomLeft", "BottomCenter", "BottomRight"]
-        Component.onCompleted: currentIndex = model.indexOf(root.cfg_wavePosition)
-        onActivated: root.cfg_wavePosition = model[currentIndex]
+    // Expanded Desktop Widgets Section
+    Item { Kirigami.FormData.isSection: true; Kirigami.FormData.label: "Expanded Modular Widgets" }
+
+    QQC2.CheckBox {
+        id: showQuickTogglesCheckBox
+        Kirigami.FormData.label: "Quick Toggles:"
+        text: "Wi-Fi, Bluetooth, DND, and Night Light switches"
+    }
+
+    QQC2.CheckBox {
+        id: showPomodoroCheckBox
+        Kirigami.FormData.label: "Pomodoro Focus Timer:"
+        text: "25/5 min focus timer with work/break modes"
+    }
+
+    QQC2.CheckBox {
+        id: showWeatherForecastCheckBox
+        Kirigami.FormData.label: "Weather Forecast:"
+        text: "3-day forecast strip from wttr.in"
+    }
+
+    QQC2.CheckBox {
+        id: showScreenshotsCheckBox
+        Kirigami.FormData.label: "Recent Captures:"
+        text: "Gallery of recent Spectacle screenshots"
+    }
+
+    QQC2.CheckBox {
+        id: showQuickLinksCheckBox
+        Kirigami.FormData.label: "Quick Launch:"
+        text: "Desktop app shortcuts tile (Terminal, Browser, IDE)"
+    }
+
+    QQC2.CheckBox {
+        id: showHabitsCheckBox
+        Kirigami.FormData.label: "Habit Tracker:"
+        text: "7-day weekly habit completion tracker"
+    }
+
+    QQC2.CheckBox {
+        id: showQuickAskCheckBox
+        Kirigami.FormData.label: "Gemini Quick Ask:"
+        text: "Embedded single-line assistant prompt bar"
+    }
+
+    QQC2.CheckBox {
+        id: showMonthCalendarCheckBox
+        Kirigami.FormData.label: "Month Calendar:"
+        text: "Dot-matrix monthly calendar view"
+    }
+
+    QQC2.CheckBox {
+        id: showNetDiskCheckBox
+        Kirigami.FormData.label: "Network & Disk:"
+        text: "Real-time throughput and I/O sparkline"
+    }
+
+    QQC2.CheckBox {
+        id: showClipboardCheckBox
+        Kirigami.FormData.label: "Clipboard History:"
+        text: "Recent clipboard snippets with click-to-copy"
+    }
+
+    QQC2.CheckBox {
+        id: showAmbientTileCheckBox
+        Kirigami.FormData.label: "Ambient Tile:"
+        text: "Decorative Nothing OS dot-matrix art tile"
     }
 }

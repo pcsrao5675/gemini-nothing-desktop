@@ -33,15 +33,17 @@ Item {
             anchors.margins: 14
             spacing: 16
 
-            // Album Artwork Card
+            // Album Artwork Card (Click to raise media player)
             Rectangle {
                 width: 110
                 height: 110
                 radius: Theme.radiusMd
                 color: Theme.surfaceAlt
-                border.color: Theme.outlineFaint
+                border.color: artMa.containsMouse ? root.accentColor : Theme.outlineFaint
                 border.width: 1
                 clip: true
+
+                Behavior on border.color { ColorAnimation { duration: Theme.durShort } }
 
                 Image {
                     anchors.fill: parent
@@ -59,6 +61,18 @@ Item {
                     font.family: Theme.fontIcons
                     font.pixelSize: 42
                     color: Theme.fgFaint
+                }
+
+                MouseArea {
+                    id: artMa
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (root.player && root.player.raise) {
+                            root.player.raise();
+                        }
+                    }
                 }
             }
 

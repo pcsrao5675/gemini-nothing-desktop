@@ -20,11 +20,25 @@ Item {
     }
 
     Rectangle {
+        id: clockBox
         anchors.fill: parent
-        color: Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 0.72)
+        color: clockMa.containsMouse ? Qt.rgba(Theme.surfaceHigh.r, Theme.surfaceHigh.g, Theme.surfaceHigh.b, 0.85) : Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 0.75)
         radius: Theme.radiusLg
-        border.color: Theme.outline
+        border.color: clockMa.containsMouse ? root.accentColor : Theme.outline
         border.width: 1
+
+        Behavior on color { ColorAnimation { duration: Theme.durShort } }
+        Behavior on border.color { ColorAnimation { duration: Theme.durShort } }
+
+        MouseArea {
+            id: clockMa
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+                root.clock24 = !root.clock24;
+            }
+        }
 
         Column {
             anchors.centerIn: parent

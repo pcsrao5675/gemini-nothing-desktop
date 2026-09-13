@@ -79,6 +79,94 @@
     <entry name="wavePosition" type="String">
       <default>BottomCenter</default>
     </entry>
+
+    <!-- Quick Toggles Widget -->
+    <entry name="showQuickToggles" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="quickTogglesPosition" type="String">
+      <default>MiddleLeft</default>
+    </entry>
+
+    <!-- Pomodoro Focus Timer Widget -->
+    <entry name="showPomodoro" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="pomodoroPosition" type="String">
+      <default>MiddleRight</default>
+    </entry>
+
+    <!-- Weather Forecast Widget -->
+    <entry name="showWeatherForecast" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="weatherForecastPosition" type="String">
+      <default>TopLeftOffset</default>
+    </entry>
+
+    <!-- Recent Screenshots Widget -->
+    <entry name="showScreenshots" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="screenshotsPosition" type="String">
+      <default>BottomRightOffset</default>
+    </entry>
+
+    <!-- Quick Links Widget -->
+    <entry name="showQuickLinks" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="quickLinksPosition" type="String">
+      <default>BottomLeftOffset</default>
+    </entry>
+
+    <!-- Habit Tracker Widget -->
+    <entry name="showHabits" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="habitsPosition" type="String">
+      <default>TopRightOffset</default>
+    </entry>
+
+    <!-- Quick Ask Bar Widget -->
+    <entry name="showQuickAsk" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="quickAskPosition" type="String">
+      <default>MiddleCenter</default>
+    </entry>
+
+    <!-- Month Calendar Widget -->
+    <entry name="showMonthCalendar" type="Bool">
+      <default>false</default>
+    </entry>
+    <entry name="monthCalendarPosition" type="String">
+      <default>CenterLeft</default>
+    </entry>
+
+    <!-- Network & Disk Widget -->
+    <entry name="showNetDisk" type="Bool">
+      <default>false</default>
+    </entry>
+    <entry name="netDiskPosition" type="String">
+      <default>CenterRight</default>
+    </entry>
+
+    <!-- Clipboard Widget -->
+    <entry name="showClipboard" type="Bool">
+      <default>false</default>
+    </entry>
+    <entry name="clipboardPosition" type="String">
+      <default>BottomLeftSecondary</default>
+    </entry>
+
+    <!-- Ambient Tile Widget -->
+    <entry name="showAmbientTile" type="Bool">
+      <default>false</default>
+    </entry>
+    <entry name="ambientTilePosition" type="String">
+      <default>CenterBottom</default>
+    </entry>
   </group>
 
 </kcfg>

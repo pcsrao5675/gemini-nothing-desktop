@@ -41,14 +41,35 @@ Item {
         }
     }
 
+    P5Support.DataSource {
+        id: execSource
+        engine: "executable"
+        connectedSources: []
+        onNewData: (cmd, data) => disconnectSource(cmd)
+    }
+
+    function toggleAssistant() {
+        execSource.connectSource("$HOME/.local/bin/gemini-toggle.sh &");
+    }
+
     Rectangle {
+        id: waveBox
         anchors.fill: parent
-        color: Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 0.72)
+        color: waveMa.containsMouse ? Qt.rgba(Theme.surfaceHigh.r, Theme.surfaceHigh.g, Theme.surfaceHigh.b, 0.85) : Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 0.72)
         radius: Theme.radiusLg
-        border.color: root.assistantActive ? root.accentColor : Theme.outline
-        border.width: 1
+        border.color: root.assistantActive ? root.accentColor : (waveMa.containsMouse ? Theme.fgDim : Theme.outline)
+        border.width: root.assistantActive || waveMa.containsMouse ? 1.5 : 1
 
         Behavior on border.color { ColorAnimation { duration: Theme.durMedium } }
+        Behavior on color { ColorAnimation { duration: Theme.durShort } }
+
+        MouseArea {
+            id: waveMa
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.toggleAssistant()
+        }
 
         Row {
             anchors.left: parent.left
@@ -72,7 +93,17 @@ Item {
                 font.pixelSize: 10
                 font.weight: Font.Bold
                 font.letterSpacing: 1.5
-                color: Theme.fgDim
+                color: waveMa.containsMouse ? Theme.fg : Theme.fgDim
+            }
+
+            Item { width: 1; height: 1 }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "auto_awesome"
+                font.family: Theme.fontIcons
+                font.pixelSize: 14
+                color: root.assistantActive ? root.accentColor : (waveMa.containsMouse ? Theme.fg : Theme.fgFaint)
             }
         }
 
