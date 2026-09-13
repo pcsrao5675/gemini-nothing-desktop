@@ -52,9 +52,30 @@ PlasmoidItem {
     readonly property bool showClipboard: Plasmoid.configuration.showClipboard ?? false
     readonly property bool showAmbientTile: Plasmoid.configuration.showAmbientTile ?? false
 
+    // Signature Behavior: One-Click Focus Mode
+    property bool focusModeActive: false
+
     fullRepresentation: Item {
         id: container
         anchors.fill: parent
+
+        // ── 1. Glyph-Style Ambient Border Light (Screen Edge) ──
+        GlyphBorderLight {
+            id: glyphBorderLight
+            accentColor: root.accentColor
+            focusMode: root.focusModeActive
+        }
+
+        // ── Focus Mode Background Dimmer ──
+        Rectangle {
+            id: focusDimmer
+            anchors.fill: parent
+            color: "#000000"
+            opacity: root.focusModeActive ? 0.35 : 0.0
+            visible: opacity > 0.01
+            enabled: false
+            Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
+        }
 
         // Top System Beacon Strip
         Rectangle {
@@ -70,6 +91,9 @@ PlasmoidItem {
             color: Qt.rgba(13/255, 14/255, 15/255, 0.90)
             border.color: Qt.rgba(64/255, 71/255, 82/255, 0.35)
             border.width: 1
+            visible: !root.focusModeActive
+            opacity: visible ? 1.0 : 0.0
+            Behavior on opacity { NumberAnimation { duration: 300 } }
 
             Row {
                 anchors.left: parent.left
@@ -253,7 +277,7 @@ PlasmoidItem {
             anchors.bottom: bottomBar.top
             anchors.bottomMargin: 16
 
-            // LEFT COLUMN: Agenda + Vitals 2x2 Telemetry + Scratchpad Notes
+            // LEFT COLUMN: Vitals Telemetry + Scratchpad Notes (Notes persists in Focus Mode)
             Column {
                 id: leftCol
                 anchors.left: parent.left
@@ -261,19 +285,13 @@ PlasmoidItem {
                 width: 360
                 spacing: 14
 
-                AgendaWidget {
-                    id: agendaWidget
-                    width: parent.width
-                    visible: root.showAgenda
-                    accentColor: root.accentColor
-                    icsFilePath: root.icsFilePath
-                }
-
                 VitalsWidget {
                     id: vitalsWidget
                     width: parent.width
-                    visible: root.showVitals
+                    visible: root.showVitals && !root.focusModeActive
+                    opacity: visible ? 1.0 : 0.0
                     accentColor: root.accentColor
+                    Behavior on opacity { NumberAnimation { duration: 300 } }
                 }
 
                 NotesWidget {
@@ -288,12 +306,12 @@ PlasmoidItem {
                 }
             }
 
-            // CENTER COLUMN: Big Clock Hero + Weather Forecast 6-Hour Strip + Focus Pomodoro
+            // CENTER COLUMN: Big Clock Hero (minute-dissolve + day-progress ticks) + Weather Forecast + Focus Exit Pill
             Column {
                 id: centerCol
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                width: Math.max(300, parent.width - 760) // Remaining flexible center width
+                width: Math.max(300, parent.width - 760)
                 spacing: 14
 
                 ClockWidget {
@@ -304,41 +322,90 @@ PlasmoidItem {
                     accentColor: root.accentColor
                 }
 
+                // Exit Focus Mode pill (appears under clock when Focus Mode is on)
+                Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 32
+                    radius: 16
+                    color: Qt.rgba(30/255, 30/255, 30/255, 0.92)
+                    border.color: root.accentColor
+                    border.width: 1
+                    visible: root.focusModeActive
+                    implicitWidth: focusExitRow.implicitWidth + 24
+
+                    Row {
+                        id: focusExitRow
+                        anchors.centerIn: parent
+                        spacing: 8
+                        Text {
+                            text: "close"
+                            font.family: Theme.fontIcons
+                            font.pixelSize: 16
+                            color: root.accentColor
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        Text {
+                            text: "EXIT FOCUS MODE"
+                            font.family: Theme.fontDots
+                            font.pixelSize: 10
+                            font.letterSpacing: 1.5
+                            color: Theme.fg
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            root.focusModeActive = false;
+                            quickTogglesWidget.focusModeEnabled = false;
+                        }
+                    }
+                }
+
                 WeatherForecastWidget {
                     id: weatherForecastWidget
                     width: parent.width
-                    visible: root.showWeatherForecast
+                    visible: root.showWeatherForecast && !root.focusModeActive
+                    opacity: visible ? 1.0 : 0.0
                     accentColor: root.accentColor
-                }
-
-                PomodoroWidget {
-                    id: pomodoroWidget
-                    width: parent.width
-                    visible: root.showPomodoro
-                    accentColor: root.accentColor
+                    Behavior on opacity { NumberAnimation { duration: 300 } }
                 }
             }
 
-            // RIGHT COLUMN: Media Player + Quick System Toggles + Month Calendar / Habits
+            // RIGHT COLUMN: Unified "Now" Card + Quick System Toggles + Month Calendar
             Column {
                 id: rightCol
                 anchors.right: parent.right
                 anchors.top: parent.top
                 width: 360
                 spacing: 14
+                visible: !root.focusModeActive
+                opacity: visible ? 1.0 : 0.0
+                Behavior on opacity { NumberAnimation { duration: 300 } }
 
-                MediaWidget {
-                    id: mediaWidget
+                // ── 3. Unified "Now" Card (Priority: Pomodoro > Media > Calendar Event > Hidden) ──
+                NowCardWidget {
+                    id: nowCardWidget
                     width: parent.width
-                    visible: root.showMedia
                     accentColor: root.accentColor
+                    icsFilePath: root.icsFilePath
+                    onPomodoroCompleted: {
+                        glyphBorderLight.triggerPomodoroFlash();
+                    }
                 }
 
+                // ── Quick Toggles with Focus Mode Toggle ──
                 QuickTogglesWidget {
                     id: quickTogglesWidget
                     width: parent.width
                     visible: root.showQuickToggles
                     accentColor: root.accentColor
+                    focusModeEnabled: root.focusModeActive
+                    onFocusModeToggled: (active) => {
+                        root.focusModeActive = active;
+                    }
                 }
 
                 MonthCalendarWidget {
@@ -374,6 +441,9 @@ PlasmoidItem {
             anchors.leftMargin: 32
             anchors.rightMargin: 32
             height: 125
+            visible: !root.focusModeActive
+            opacity: visible ? 1.0 : 0.0
+            Behavior on opacity { NumberAnimation { duration: 300 } }
 
             Row {
                 anchors.top: parent.top

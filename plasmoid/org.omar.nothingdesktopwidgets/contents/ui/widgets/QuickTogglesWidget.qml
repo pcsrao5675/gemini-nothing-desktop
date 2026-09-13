@@ -7,12 +7,15 @@ Item {
 
     property color accentColor: Theme.accent
     implicitWidth: 320
-    implicitHeight: 180
+    implicitHeight: 235
 
     property bool wifiEnabled: true
     property bool btEnabled: false
     property bool dndEnabled: false
     property bool nightLightEnabled: false
+    property bool focusModeEnabled: false
+
+    signal focusModeToggled(bool active)
 
     property string currentNetwork: "Wi-Fi Connected"
 
@@ -250,6 +253,49 @@ Item {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.toggleNightLight()
+                    }
+                }
+            }
+
+            // 5. One-Click Focus Mode Pill
+            Rectangle {
+                width: parent.width
+                height: 38
+                radius: Theme.radiusMd
+                color: root.focusModeEnabled ? Qt.rgba(root.accentColor.r, root.accentColor.g, root.accentColor.b, 0.25) : Qt.rgba(Theme.surfaceAlt.r, Theme.surfaceAlt.g, Theme.surfaceAlt.b, 0.8)
+                border.color: root.focusModeEnabled ? root.accentColor : Theme.outline
+                border.width: 1
+
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 8
+                    Rectangle {
+                        width: 6; height: 6; radius: 3; color: root.focusModeEnabled ? root.accentColor : Theme.fgFaint
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Text {
+                        text: "center_focus_strong"
+                        font.family: Theme.fontIcons
+                        font.pixelSize: 18
+                        color: root.focusModeEnabled ? root.accentColor : Theme.fgDim
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Text {
+                        text: "FOCUS MODE: " + (root.focusModeEnabled ? "ACTIVE" : "OFF")
+                        font.family: Theme.fontDots
+                        font.pixelSize: 11
+                        font.letterSpacing: 1.5
+                        color: root.focusModeEnabled ? Theme.fg : Theme.fgDim
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        root.focusModeEnabled = !root.focusModeEnabled;
+                        root.focusModeToggled(root.focusModeEnabled);
                     }
                 }
             }

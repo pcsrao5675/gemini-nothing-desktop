@@ -19,6 +19,22 @@ Item {
         onTriggered: root.currentTime = new Date()
     }
 
+    property string displayedTimeString: Qt.formatDateTime(root.currentTime, root.clock24 ? "HH:mm" : "hh:mm")
+    readonly property real dayProgress: (root.currentTime.getHours() * 3600 + root.currentTime.getMinutes() * 60 + root.currentTime.getSeconds()) / 86400.0
+
+    onCurrentTimeChanged: {
+        var newStr = Qt.formatDateTime(root.currentTime, root.clock24 ? "HH:mm" : "hh:mm");
+        if (newStr !== root.displayedTimeString) {
+            clockTransition.swapContent(function() {
+                root.displayedTimeString = newStr;
+            });
+        }
+    }
+
+    onClock24Changed: {
+        root.displayedTimeString = Qt.formatDateTime(root.currentTime, root.clock24 ? "HH:mm" : "hh:mm");
+    }
+
     Rectangle {
         id: clockBox
         anchors.fill: parent
@@ -44,15 +60,24 @@ Item {
             anchors.centerIn: parent
             spacing: 8
 
-            // Giant Dot-Matrix Time
-            Text {
-                id: timeText
+            // Giant Dot-Matrix Time with Dot-Dissolve Minute Tick
+            DotDissolveTransition {
+                id: clockTransition
+                width: timeText.implicitWidth
+                height: timeText.implicitHeight
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: Qt.formatDateTime(root.currentTime, root.clock24 ? "HH:mm" : "hh:mm")
-                font.family: Theme.fontDots
-                font.pixelSize: 72
-                font.letterSpacing: 4
-                color: Theme.fg
+                dotColor: root.accentColor
+                duration: 400
+
+                Text {
+                    id: timeText
+                    anchors.centerIn: parent
+                    text: root.displayedTimeString
+                    font.family: Theme.fontDots
+                    font.pixelSize: 72
+                    font.letterSpacing: 4
+                    color: Theme.fg
+                }
             }
 
             // Date + Seconds Dot
@@ -86,6 +111,29 @@ Item {
                     font.family: Theme.fontDots
                     font.pixelSize: 15
                     color: root.accentColor
+                }
+            }
+
+            // Day-Progress Hairline: Row of dot-matrix ticks
+            Row {
+                id: dayHairline
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 3
+                topPadding: 4
+
+                Repeater {
+                    model: 48 // 48 ticks = half-hour increments throughout 24 hours
+                    Rectangle {
+                        width: 3
+                        height: (index % 12 === 0) ? 5 : (index % 2 === 0 ? 3 : 2)
+                        radius: 1
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: (index / 48.0) <= root.dayProgress ? root.accentColor : Theme.outline
+                        opacity: (index / 48.0) <= root.dayProgress ? 0.95 : 0.25
+
+                        Behavior on color { ColorAnimation { duration: 300 } }
+                        Behavior on opacity { NumberAnimation { duration: 300 } }
+                    }
                 }
             }
         }

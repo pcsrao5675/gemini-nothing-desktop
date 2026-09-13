@@ -26,11 +26,13 @@ graph TD
         NotifDaemon["Nothing Notification Daemon<br/>(daemon/notifications/server.py)"]
     end
 
-    subgraph "Wallpaper Widget Layer"
-        WidgetsLeft["Agenda & Schedule (Interactive)<br/>Weather Forecast (3-Day)<br/>Quick Toggles (Wi-Fi, BT, DND)<br/>Quick Links (Terminal, IDE, Web)<br/>Month Calendar"]
-        WidgetsCenter["Dot-Matrix Clock & Date<br/>Gemini Quick-Ask Prompt Bar<br/>Nothing Ambient Wave Tile"]
-        WidgetsRight["System Vitals (Interactive Sparklines)<br/>Pomodoro Focus Timer (25/5m)<br/>Habits Tracker (7-Day)<br/>Recent Captures Gallery<br/>Quick Notes (Live Auto-Save)<br/>Network & Disk I/O Sparklines<br/>Clipboard History Strip"]
-        NowPlaying["MPRIS Media Player Card<br/>(D-Bus Controls + Raise)"]
+    subgraph "Wallpaper & Desktop Widget Layer"
+        GlyphBorder["Glyph Ambient Border Light<br/>(Charging Pulse / Notification Flash / Pomodoro Red)"]
+        NowCard["Unified 'Now' Card (Contextual)<br/>(Pomodoro > Media > Next Event > Hidden)"]
+        CenterClock["Dot-Matrix Clock & Date<br/>(Dot-Dissolve Minute Tick & Day-Progress Hairline)"]
+        PersistentWidgets["Persistent Widgets<br/>(System Vitals, Quick Notes, Quick Toggles, Month Calendar)"]
+        FocusToggle["One-Click Focus Mode<br/>(Dims Background & Silences Non-Critical Notifications)"]
+        DotEngine["Dot-Dissolve Transition Engine<br/>(Reusable Matrix Scatter/Assemble Component)"]
     end
 
     subgraph "Daemon Microservices (Localhost:8765)"
@@ -68,12 +70,14 @@ graph TD
     Daemon -->|Streams PNG Image| Ext
 
     %% Wallpaper Widget Connections
-    Wallpaper --> WidgetsLeft
-    Wallpaper --> WidgetsCenter
-    Wallpaper --> WidgetsRight
-    Wallpaper --> NowPlaying
-    WidgetsCenter -->|Summons / Queries| Toggle
-    NowPlaying -->|D-Bus MPRIS Raise| KWin
+    Wallpaper --> GlyphBorder
+    Wallpaper --> CenterClock
+    Wallpaper --> NowCard
+    Wallpaper --> PersistentWidgets
+    PersistentWidgets --> FocusToggle
+    NowCard --> DotEngine
+    CenterClock --> DotEngine
+    NowCard -->|D-Bus MPRIS Raise| KWin
 ```
 
 ### Desktop Screen Real Estate Layout
@@ -115,25 +119,17 @@ graph TD
 - **Desktop Widgets Applet (`plasmoid/org.omar.nothingdesktopwidgets`)**: Native KDE Plasma 6 Desktop Applet (`Plasma/Applet`) placed full-screen across the desktop containment (`org.kde.desktopcontainment`) with zero background (`PlasmaCore.Types.NoBackground`), delivering 100% complete mouse pointer interactivity, keyboard text editing, button controls, and sparkline animations on Wayland.
 - **Automated Placement Tool (`bin/install-desktop-widgets.sh`)**: Automatically synchronizes both components, registers the desktop applet with KDE's containment scripting engine, and ensures full-screen pixel geometry.
 
-- **Full Widget Interactivity & Screen Coverage**:
-  - *Agenda & Schedule*: Interactive event items with hover animations, in-place details expansion, check/dismiss action buttons, and launch calendar (`merkuro-calendar`, `korganizer`).
-  - *Quick Notes*: Multi-line editable notepad with dual-layer persistent auto-saving (`plasmoid.configuration.notesContent` and `~/.local/share/nothing-desktop/quicknotes.txt`).
-  - *System Vitals*: Real-time CPU, RAM, Battery, and multi-vendor GPU telemetry. Clicks expand live 60-second canvas sparkline graphs or launch KDE System Monitor; Battery launches KDE Power Management.
-  - *MPRIS Media Card*: Album artwork, track metadata, play/pause/skip buttons via D-Bus, and click-to-raise active media player.
-  - *Nothing Ambient Wave*: Sinusoidal wave oscillating at 40 FPS; clicking launches the floating Gemini assistant.
-- **Expanded Modular Widget Suite**:
-  - *Quick Toggles Panel*: Real-time switches for Wi-Fi, Bluetooth, Do Not Disturb, and Night Light.
-  - *Focus / Pomodoro Timer*: 25-minute work and 5-minute break timer with visual progress bar and pause/reset controls.
-  - *Weather Forecast Strip*: 3-day forecast with conditions and temperature ranges from `wttr.in`.
-  - *Recent Captures Gallery*: Thumbnails of latest Spectacle screenshots with click-to-open and quick-capture button.
-  - *Quick Launch Tile*: Instant dock buttons for Terminal, Browser, Code/IDE, File Manager, Settings, and System Monitor.
-  - *Habit & Goal Tracker*: 7-day persistent completion dots for weekly goals.
-  - *Gemini Quick-Ask Bar*: Desktop search/prompt bar that triggers the floating assistant with the entered query.
+- **Signature Behaviors (Iteration 4)**:
+  - *Glyph-Style Ambient Border Light (`GlyphBorderLight.qml`)*: Ultra-subtle 2.5px light strip around the primary screen boundary. Breathes slowly in Electric Blue (`#4DA3FF`) during AC charging; fires a swift 700ms pulse on incoming system notifications (`org.kde.notificationmanager`); flashes in high-urgency warm red (`#D71921`) when Pomodoro sessions finish; stays completely invisible during idle periods.
+  - *Unified Contextual 'Now' Card (`NowCardWidget.qml`)*: Consolidates transient cards into a single priority-driven card: **Active Pomodoro > Now-Playing Media > Next Calendar Event > (Hidden/Collapsed)**. Dot-dissolves out entirely when no contextual events are active.
+  - *Dot-Dissolve Transition Component (`DotDissolveTransition.qml`)*: Reusable QML component rendering content dispersing into and assembling from a Nothing OS pseudo-random dot matrix. Applied across minute clock ticks, Now card state changes, and Focus Mode transitions.
+  - *Day-Progress Hairline*: Minimal row of 48 dot-matrix ticks positioned directly beneath the date display, illuminating in `#4DA3FF` in real time to show elapsed percentage of the 24-hour day.
+  - *One-Click Focus Mode*: Dedicated toggle in Quick Toggles and dock that instantly dims the wallpaper, suppresses notification pulses, and hides all non-essential widgets—retaining solely the Center Clock and Quick Notes. A minimal "Exit Focus Mode" pill appears below the clock for instant one-click restoration.
+- **Persistent Core Widgets**:
+  - *System Vitals*: Real-time CPU, RAM, Battery, and GPU telemetry with live 60-second canvas sparkline graphs.
+  - *Quick Notes*: Multi-line editable notepad with dual-layer persistent auto-saving (`~/.local/share/nothing-desktop/quicknotes.txt`).
+  - *Quick Toggles*: Wi-Fi, Bluetooth, DND, Night Light, and Focus Mode toggles.
   - *Month Calendar View*: Dot-matrix calendar grid with current day highlight.
-  - *Network & Disk I/O*: Real-time network throughput and disk activity sparklines.
-  - *Clipboard History*: Quick-copy snippet tiles with `wl-copy` clipboard integration.
-  - *Sinusoidal Ambient Tile*: Procedural Nothing OS wave artwork.
-- **Native Configuration Surface**: Qt/Kirigami settings panel in Plasma's "Desktop and Wallpaper" dialog allowing individual toggling of every widget and placement configuration.
 
 ### 2. Top Bar Applet: Nothing OS Island (`plasmoid/org.omar.nothingisland`)
 Declarative topbar applet for KDE Plasma 6:
