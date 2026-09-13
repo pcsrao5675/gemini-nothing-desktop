@@ -89,24 +89,16 @@ graph TD
 +---------------------------------------------------------------------------------------------------+
 |                                                                                                   |
 |  [ LEFT COLUMN ]                       [ CENTER COLUMN ]                     [ RIGHT COLUMN ]     |
-|  * Agenda & Schedule                   * Dot-Matrix Clock                    * System Vitals      |
-|    - Expand details & calendar link      - Pulse seconds indicator             - CPU/RAM 60s live |
-|    - Complete/dismiss events           * Gemini Quick-Ask                      - Click SystemMon  |
-|  * 3-Day Weather Forecast                - On-desktop prompt bar             * Focus Pomodoro     |
-|    - wttr.in temperatures                - Direct assistant summon             - 25m/5m cycles    |
-|  * Quick Toggles                       * Nothing Ambient Tile                * Habit Tracker      |
-|    - Wi-Fi, BT, DND, Night Light         - Sinusoidal dot matrix               - 7-day checklist  |
-|  * Quick Launch Dock                                                         * Captures Gallery   |
-|    - Terminal, Web, IDE, Files                                                 - Spectacle snaps  |
-|  * Month Calendar View                                                       * Quick Notes        |
-|    - Interactive dot grid                                                      - Multi-line edit  |
-|                                                                                - Persistent sync  |
-|                                                                              * Net & Disk Graph   |
-|                                                                              * Clipboard History  |
+|  * Today Weather Chip                  * Dot-Matrix Clock & Date             * System Vitals      |
+|    - Compact 38px temperature            - Day-progress hairline               - CPU/RAM 60s live |
+|    - Condition & wttr.in refresh       * AI Launcher Pills                   * Focus Pomodoro     |
+|  * Quick Toggles                         - Claude & Gemini quick pills         - Compact 44px ring|
+|    - Wi-Fi, BT, DND, Night Light                                             * Quick Notes        |
+|  * Month Calendar View                                                         - Multi-line edit  |
+|    - Interactive dot grid                                                      - Persistent sync  |
 |                                                                                                   |
-|  [ Now-Playing Media Card ]            [ Ambient Assistant Wave ]                                 |
-|  - Album art, artist, title            - 40 FPS audio reactive                                    |
-|  - MPRIS play/pause/skip               - Click summons Gemini                                     |
+|  [ Gemini Quick-Ask (340px) ]          [ Ambient Assistant Wave ]            [ Dock Tiles ]       |
+|  - Single-line prompt bar              - Audio-reactive center wave          - Term, Web, IDE     |
 +---------------------------------------------------------------------------------------------------+
 ```
 

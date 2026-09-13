@@ -6,15 +6,12 @@ Item {
     id: root
 
     property color accentColor: Theme.accent
-    implicitWidth: 320
-    implicitHeight: 180
+    implicitWidth: 260
+    implicitHeight: 38
 
-    property string cityName: "LOCAL"
-    property var forecastDays: [
-        { day: "TODAY", temp: "28°C", cond: "wb_sunny", desc: "Clear" },
-        { day: "TOM",   temp: "26°C", cond: "partly_cloudy_day", desc: "Partly Cloudy" },
-        { day: "WED",   temp: "24°C", cond: "rainy", desc: "Showers" }
-    ]
+    property string temp: "22°C"
+    property string condIcon: "wb_sunny"
+    property string condDesc: "CLEAR SKY"
 
     P5Support.DataSource {
         id: execSource
@@ -26,27 +23,19 @@ Item {
             const out = (data["stdout"] ?? "").trim();
             if (out) {
                 try {
-                    const lines = out.split("\n");
-                    var items = [];
-                    for (var i = 0; i < lines.length && i < 3; i++) {
-                        var parts = lines[i].split("|");
-                        if (parts.length >= 4) {
-                            items.push({
-                                day: parts[0],
-                                temp: parts[1],
-                                cond: parts[2],
-                                desc: parts[3]
-                            });
-                        }
+                    const parts = out.split("|");
+                    if (parts.length >= 3) {
+                        root.temp = parts[0] + "°C";
+                        root.condIcon = parts[1] || "wb_sunny";
+                        root.condDesc = (parts[2] || "CLEAR").toUpperCase();
                     }
-                    if (items.length > 0) root.forecastDays = items;
                 } catch(e) {}
             }
         }
     }
 
     Timer {
-        interval: 1800000 // 30 minutes
+        interval: 1800000 // 30 mins
         running: true
         repeat: true
         triggeredOnStart: true
@@ -57,122 +46,77 @@ Item {
 "    req = urllib.request.Request(\"https://wttr.in/?format=j1\", headers={\"User-Agent\": \"curl/7.68.0\"})\n" +
 "    with urllib.request.urlopen(req, timeout=4) as response:\n" +
 "        data = json.loads(response.read().decode())\n" +
-"        weather = data.get(\"weather\", [])\n" +
-"        days = [\"TODAY\", \"TOM\", \"NEXT\"]\n" +
-"        for i, w in enumerate(weather[:3]):\n" +
-"            day_name = days[i]\n" +
-"            max_c = w.get(\"maxtempC\", \"--\")\n" +
-"            min_c = w.get(\"mintempC\", \"--\")\n" +
-"            desc = w.get(\"hourly\", [{}])[0].get(\"weatherDesc\", [{}])[0].get(\"value\", \"Clear\")\n" +
-"            cond = \"wb_sunny\" if \"sun\" in desc.lower() or \"clear\" in desc.lower() else (\"rainy\" if \"rain\" in desc.lower() else \"cloud\")\n" +
-"            print(f\"{day_name}|{min_c}°- {max_c}°C|{cond}|{desc}\")\n" +
-"except Exception as e:\n" +
-"    pass\n" +
-"' || true");
+"        curr = data.get(\"current_condition\", [{}])[0]\n" +
+"        temp_c = curr.get(\"temp_C\", \"22\")\n" +
+"        desc = curr.get(\"weatherDesc\", [{}])[0].get(\"value\", \"Clear\")\n" +
+"        desc_l = desc.lower()\n" +
+"        icon = \"wb_sunny\"\n" +
+"        if \"rain\" in desc_l or \"shower\" in desc_l: icon = \"rainy\"\n" +
+"        elif \"snow\" in desc_l: icon = \"ac_unit\"\n" +
+"        elif \"cloud\" in desc_l or \"overcast\" in desc_l: icon = \"partly_cloudy_day\"\n" +
+"        elif \"thunder\" in desc_l: icon = \"thunderstorm\"\n" +
+"        print(f\"{temp_c}|{icon}|{desc}\")\n" +
+"except Exception:\n" +
+"    print(\"22|wb_sunny|Clear Sky\")\n" +
+"'");
         }
     }
 
     Rectangle {
         anchors.fill: parent
-        color: Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 0.75)
-        radius: Theme.radiusLg
-        border.color: Theme.outline
+        radius: 19
+        color: weatherMa.containsMouse ? Qt.rgba(Theme.surfaceHigh.r, Theme.surfaceHigh.g, Theme.surfaceHigh.b, 0.90) : Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 0.75)
+        border.color: weatherMa.containsMouse ? root.accentColor : Theme.outline
         border.width: 1
 
-        Column {
-            anchors.fill: parent
-            anchors.margins: 16
-            spacing: 12
+        Behavior on color { ColorAnimation { duration: Theme.durShort } }
+        Behavior on border.color { ColorAnimation { duration: Theme.durShort } }
 
-            // Header
-            Row {
-                width: parent.width
-                spacing: 8
+        Row {
+            anchors.centerIn: parent
+            spacing: 8
 
-                Text {
-                    text: Theme.iconWeather
-                    font.family: Theme.fontIcons
-                    font.pixelSize: 18
-                    color: root.accentColor
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Text {
-                    text: "3-DAY FORECAST"
-                    font.family: Theme.fontDots
-                    font.pixelSize: 13
-                    font.letterSpacing: 2
-                    color: Theme.fg
-                    anchors.verticalCenter: parent.verticalCenter
-                }
+            Text {
+                text: root.condIcon
+                font.family: Theme.fontIcons
+                font.pixelSize: 16
+                color: "#FFB95C"
+                anchors.verticalCenter: parent.verticalCenter
             }
 
-            // 3 Day Columns
-            Row {
-                width: parent.width
-                spacing: 8
+            Text {
+                text: root.temp
+                font.family: Theme.fontDots
+                font.pixelSize: 13
+                color: Theme.fg
+                font.bold: true
+                anchors.verticalCenter: parent.verticalCenter
+            }
 
-                Repeater {
-                    model: root.forecastDays
-                    delegate: Rectangle {
-                        width: (parent.width - 16) / 3
-                        height: 95
-                        radius: Theme.radiusMd
-                        color: Qt.rgba(Theme.surfaceAlt.r, Theme.surfaceAlt.g, Theme.surfaceAlt.b, 0.6)
-                        border.color: index === 0 ? Qt.rgba(root.accentColor.r, root.accentColor.g, root.accentColor.b, 0.4) : Theme.outline
-                        border.width: 1
+            Rectangle {
+                width: 1
+                height: 12
+                color: Theme.outlineFaint
+                anchors.verticalCenter: parent.verticalCenter
+            }
 
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: 4
+            Text {
+                text: root.condDesc
+                font.family: Theme.fontUi
+                font.pixelSize: 10
+                font.letterSpacing: 1.2
+                color: Theme.fgDim
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
 
-                            Text {
-                                text: modelData.day
-                                font.family: Theme.fontDots
-                                font.pixelSize: 11
-                                font.letterSpacing: 1
-                                color: index === 0 ? root.accentColor : Theme.fgDim
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            Text {
-                                text: modelData.cond === "wb_sunny" ? Theme.iconWeather : (modelData.cond === "rainy" ? "water_drop" : "cloud")
-                                font.family: Theme.fontIcons
-                                font.pixelSize: 22
-                                color: index === 0 ? root.accentColor : Theme.fg
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            Text {
-                                text: modelData.temp
-                                font.family: Theme.fontUi
-                                font.pixelSize: 12
-                                font.bold: true
-                                color: Theme.fg
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-
-                            Text {
-                                text: modelData.desc
-                                font.family: Theme.fontUi
-                                font.pixelSize: 9
-                                color: Theme.fgDim
-                                elide: Text.ElideRight
-                                width: parent.parent.width - 8
-                                horizontalAlignment: Text.AlignHCenter
-                                anchors.horizontalCenter: parent.horizontalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                execSource.connectSource("which kweather >/dev/null 2>&1 && kweather & || xdg-open https://wttr.in &");
-                            }
-                        }
-                    }
-                }
+        MouseArea {
+            id: weatherMa
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+                execSource.connectSource("which kweather >/dev/null 2>&1 && kweather & || xdg-open https://wttr.in &");
             }
         }
     }

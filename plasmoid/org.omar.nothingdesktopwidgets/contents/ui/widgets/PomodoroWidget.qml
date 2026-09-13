@@ -1,19 +1,20 @@
 import QtQuick
-import org.kde.plasma.plasma5support as P5Support
 import ".."
 
 Item {
     id: root
 
     property color accentColor: Theme.accent
-    implicitWidth: 320
-    implicitHeight: 200
+    implicitWidth: 220
+    implicitHeight: 44
 
     property int workDuration: 25 * 60
     property int breakDuration: 5 * 60
     property int remainingSeconds: 25 * 60
     property bool isRunning: false
     property bool isBreak: false
+
+    signal pomodoroCompleted()
 
     function toggleTimer() {
         isRunning = !isRunning;
@@ -33,9 +34,7 @@ Item {
     function formatTime(totalSecs) {
         const m = Math.floor(totalSecs / 60);
         const s = totalSecs % 60;
-        const mm = m < 10 ? "0" + m : "" + m;
-        const ss = s < 10 ? "0" + s : "" + s;
-        return `${mm}:${ss}`;
+        return `${m < 10 ? "0" + m : m}:${s < 10 ? "0" + s : s}`;
     }
 
     Timer {
@@ -46,6 +45,7 @@ Item {
             if (root.remainingSeconds > 0) {
                 root.remainingSeconds--;
             } else {
+                root.pomodoroCompleted();
                 root.switchMode();
             }
         }
@@ -53,152 +53,92 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 0.75)
-        radius: Theme.radiusLg
-        border.color: Theme.outline
+        radius: 22
+        color: pomoMa.containsMouse ? Qt.rgba(Theme.surfaceHigh.r, Theme.surfaceHigh.g, Theme.surfaceHigh.b, 0.90) : Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 0.75)
+        border.color: pomoMa.containsMouse ? root.accentColor : Theme.outline
         border.width: 1
 
-        Column {
+        Behavior on color { ColorAnimation { duration: Theme.durShort } }
+        Behavior on border.color { ColorAnimation { duration: Theme.durShort } }
+
+        MouseArea {
+            id: pomoMa
             anchors.fill: parent
-            anchors.margins: 16
-            spacing: 12
+            hoverEnabled: true
+            acceptedButtons: Qt.NoButton
+        }
 
-            // Header
-            Row {
-                width: parent.width
-                spacing: 8
+        Row {
+            anchors.centerIn: parent
+            spacing: 10
 
-                Text {
-                    text: Theme.iconTimer
-                    font.family: Theme.fontIcons
-                    font.pixelSize: 18
-                    color: root.isBreak ? "#4DA3FF" : Theme.alert
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Text {
-                    text: root.isBreak ? "BREAK TIMER" : "FOCUS POMODORO"
-                    font.family: Theme.fontDots
-                    font.pixelSize: 13
-                    font.letterSpacing: 2
-                    color: Theme.fg
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Item { width: 1; height: 1 }
-            }
-
-            // Big Clock Countdown Display
-            Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 12
-
-                Text {
-                    text: root.formatTime(root.remainingSeconds)
-                    font.family: Theme.fontDots
-                    font.pixelSize: 42
-                    font.letterSpacing: 3
-                    color: root.isRunning ? (root.isBreak ? root.accentColor : Theme.alert) : Theme.fg
-                }
-            }
-
-            // Progress Bar
+            // Status Indicator Dot
             Rectangle {
-                width: parent.width - 20
-                height: 4
-                radius: 2
-                color: Theme.outline
-                anchors.horizontalCenter: parent.horizontalCenter
+                width: 7
+                height: 7
+                radius: 3.5
+                color: root.isBreak ? "#4DA3FF" : Theme.alert
+                anchors.verticalCenter: parent.verticalCenter
+                opacity: root.isRunning ? 1.0 : 0.45
+            }
 
-                Rectangle {
-                    height: parent.height
-                    radius: 2
-                    color: root.isBreak ? root.accentColor : Theme.alert
-                    width: {
-                        const total = root.isBreak ? root.breakDuration : root.workDuration;
-                        return Math.max(0, Math.min(parent.width, parent.width * (1.0 - (root.remainingSeconds / total))));
-                    }
+            // Compact Digital Display
+            Text {
+                text: root.formatTime(root.remainingSeconds)
+                font.family: Theme.fontDots
+                font.pixelSize: 16
+                color: Theme.fg
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text {
+                text: root.isBreak ? "BRK" : "FOCUS"
+                font.family: Theme.fontUi
+                font.pixelSize: 9
+                font.bold: true
+                font.letterSpacing: 1.0
+                color: Theme.fgDim
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Rectangle {
+                width: 1
+                height: 14
+                color: Theme.outlineFaint
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            // Start / Pause
+            Text {
+                text: root.isRunning ? "pause" : "play_arrow"
+                font.family: Theme.fontIcons
+                font.pixelSize: 18
+                color: playBtnMa.containsMouse ? root.accentColor : Theme.fg
+                anchors.verticalCenter: parent.verticalCenter
+
+                MouseArea {
+                    id: playBtnMa
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.toggleTimer()
                 }
             }
 
-            // Controls Row
-            Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 12
+            // Reset
+            Text {
+                text: "refresh"
+                font.family: Theme.fontIcons
+                font.pixelSize: 16
+                color: resetBtnMa.containsMouse ? root.accentColor : Theme.fgDim
+                anchors.verticalCenter: parent.verticalCenter
 
-                // Start/Pause Button
-                Rectangle {
-                    width: 90
-                    height: 32
-                    radius: Theme.radiusMd
-                    color: root.isRunning ? Qt.rgba(Theme.alert.r, Theme.alert.g, Theme.alert.b, 0.25) : Qt.rgba(root.accentColor.r, root.accentColor.g, root.accentColor.b, 0.25)
-                    border.color: root.isRunning ? Theme.alert : root.accentColor
-                    border.width: 1
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: root.isRunning ? "PAUSE" : "START"
-                        font.family: Theme.fontUi
-                        font.pixelSize: 11
-                        font.bold: true
-                        color: Theme.fg
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.toggleTimer()
-                    }
-                }
-
-                // Reset Button
-                Rectangle {
-                    width: 70
-                    height: 32
-                    radius: Theme.radiusMd
-                    color: Qt.rgba(Theme.surfaceAlt.r, Theme.surfaceAlt.g, Theme.surfaceAlt.b, 0.8)
-                    border.color: Theme.outline
-                    border.width: 1
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: "RESET"
-                        font.family: Theme.fontUi
-                        font.pixelSize: 11
-                        font.bold: true
-                        color: Theme.fgDim
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.resetTimer()
-                    }
-                }
-
-                // Mode Toggle Button (25m / 5m)
-                Rectangle {
-                    width: 80
-                    height: 32
-                    radius: Theme.radiusMd
-                    color: Qt.rgba(Theme.surfaceAlt.r, Theme.surfaceAlt.g, Theme.surfaceAlt.b, 0.8)
-                    border.color: Theme.outline
-                    border.width: 1
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: root.isBreak ? "WORK" : "BREAK"
-                        font.family: Theme.fontUi
-                        font.pixelSize: 11
-                        font.bold: true
-                        color: Theme.fgDim
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.switchMode()
-                    }
+                MouseArea {
+                    id: resetBtnMa
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.resetTimer()
                 }
             }
         }

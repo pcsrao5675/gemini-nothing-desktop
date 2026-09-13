@@ -32,25 +32,16 @@ PlasmoidItem {
     readonly property bool showClock: Plasmoid.configuration.showClock ?? true
     readonly property bool clock24: Plasmoid.configuration.clock24 ?? true
     readonly property bool showVitals: Plasmoid.configuration.showVitals ?? true
-    readonly property bool showMedia: Plasmoid.configuration.showMedia ?? true
-    readonly property bool showAgenda: Plasmoid.configuration.showAgenda ?? true
-    readonly property string icsFilePath: Plasmoid.configuration.icsFilePath || ""
     readonly property bool showNotes: Plasmoid.configuration.showNotes ?? true
     property string notesContent: Plasmoid.configuration.notesContent || ""
     readonly property bool showAssistantWave: Plasmoid.configuration.showAssistantWave ?? true
 
     // Expanded Modular Widgets
     readonly property bool showQuickToggles: Plasmoid.configuration.showQuickToggles ?? true
-    readonly property bool showPomodoro: Plasmoid.configuration.showPomodoro ?? true
     readonly property bool showWeatherForecast: Plasmoid.configuration.showWeatherForecast ?? true
-    readonly property bool showScreenshots: Plasmoid.configuration.showScreenshots ?? false
     readonly property bool showQuickLinks: Plasmoid.configuration.showQuickLinks ?? true
-    readonly property bool showHabits: Plasmoid.configuration.showHabits ?? false
     readonly property bool showQuickAsk: Plasmoid.configuration.showQuickAsk ?? true
     readonly property bool showMonthCalendar: Plasmoid.configuration.showMonthCalendar ?? false
-    readonly property bool showNetDisk: Plasmoid.configuration.showNetDisk ?? false
-    readonly property bool showClipboard: Plasmoid.configuration.showClipboard ?? false
-    readonly property bool showAmbientTile: Plasmoid.configuration.showAmbientTile ?? false
 
     // Signature Behavior: One-Click Focus Mode
     property bool focusModeActive: false
@@ -77,213 +68,25 @@ PlasmoidItem {
             Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.InOutQuad } }
         }
 
-        // Top System Beacon Strip
-        Rectangle {
-            id: beaconStrip
-            anchors.top: parent.top
-            anchors.topMargin: 12
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.leftMargin: 32
-            anchors.rightMargin: 32
-            height: 36
-            radius: 18
-            color: Qt.rgba(13/255, 14/255, 15/255, 0.90)
-            border.color: Qt.rgba(64/255, 71/255, 82/255, 0.35)
-            border.width: 1
-            visible: !root.focusModeActive
-            opacity: visible ? 1.0 : 0.0
-            Behavior on opacity { NumberAnimation { duration: 300 } }
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: 16
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 12
-
-                Row {
-                    spacing: 6
-                    anchors.verticalCenter: parent.verticalCenter
-                    Rectangle {
-                        width: 8
-                        height: 8
-                        radius: 4
-                        color: Theme.alert
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    Text {
-                        text: "SYS // LIVE"
-                        font.family: Theme.fontDots
-                        font.pixelSize: 10
-                        font.letterSpacing: 2
-                        color: Theme.fgDim
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Rectangle { width: 1; height: 14; color: Qt.rgba(1, 1, 1, 0.15); anchors.verticalCenter: parent.verticalCenter }
-
-                Row {
-                    spacing: 6
-                    anchors.verticalCenter: parent.verticalCenter
-                    Text {
-                        text: Theme.iconWeather
-                        font.family: Theme.fontIcons
-                        font.pixelSize: 14
-                        color: "#FFB95C"
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    Text {
-                        text: "22°C TOKYO"
-                        font.family: Theme.fontUi
-                        font.pixelSize: 11
-                        color: Theme.fg
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-            }
-
-            // Center Gemini Indicator
-            Row {
-                anchors.centerIn: parent
-                spacing: 8
-
-                Rectangle {
-                    height: 22
-                    radius: 11
-                    color: Qt.rgba(31/255, 32/255, 33/255, 0.9)
-                    border.color: Qt.rgba(1, 1, 1, 0.1)
-                    border.width: 1
-                    implicitWidth: badgeRow.implicitWidth + 16
-
-                    Row {
-                        id: badgeRow
-                        anchors.centerIn: parent
-                        spacing: 6
-                        Rectangle {
-                            width: 6
-                            height: 6
-                            radius: 3
-                            color: Theme.alert
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        Text {
-                            text: "GEMINI ACTIVE"
-                            font.family: Theme.fontDots
-                            font.pixelSize: 9
-                            font.letterSpacing: 1.5
-                            color: Theme.fg
-                            font.bold: true
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                }
-
-                Text {
-                    text: "STATION: 1920×1080@144HZ"
-                    font.family: Theme.fontUi
-                    font.pixelSize: 10
-                    color: Theme.fgDim
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-
-            // Right Beacon Cluster
-            Row {
-                anchors.right: parent.right
-                anchors.rightMargin: 16
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 12
-
-                Row {
-                    spacing: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    Text {
-                        text: Theme.iconWifi
-                        font.family: Theme.fontIcons
-                        font.pixelSize: 14
-                        color: root.accentColor
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    Text {
-                        text: "MIMO_5G"
-                        font.family: Theme.fontUi
-                        font.pixelSize: 10
-                        color: Theme.fgDim
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Row {
-                    spacing: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    Text {
-                        text: "volume_up"
-                        font.family: Theme.fontIcons
-                        font.pixelSize: 14
-                        color: Theme.fgDim
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    Text {
-                        text: "68%"
-                        font.family: Theme.fontUi
-                        font.pixelSize: 10
-                        color: Theme.fg
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Rectangle {
-                    height: 20
-                    radius: 10
-                    color: Qt.rgba(31/255, 32/255, 33/255, 0.9)
-                    border.color: Qt.rgba(1, 1, 1, 0.1)
-                    border.width: 1
-                    implicitWidth: batRow.implicitWidth + 12
-
-                    Row {
-                        id: batRow
-                        anchors.centerIn: parent
-                        spacing: 4
-                        Text {
-                            text: "bolt"
-                            font.family: Theme.fontIcons
-                            font.pixelSize: 13
-                            color: root.accentColor
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        Text {
-                            text: (vitalsWidget ? vitalsWidget.batVal : "94") + "%"
-                            font.family: Theme.fontUi
-                            font.pixelSize: 10
-                            font.bold: true
-                            color: Theme.fg
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                }
-            }
-        }
-
-        // Main 3-Column Widgets Grid
+        // Main 3-Column Widgets Grid (Anchored from top of desktop with comfortable margin)
         Item {
             id: gridContainer
-            anchors.top: beaconStrip.bottom
-            anchors.topMargin: 16
+            anchors.top: parent.top
+            anchors.topMargin: 40
             anchors.left: parent.left
-            anchors.leftMargin: 32
+            anchors.leftMargin: 36
             anchors.right: parent.right
-            anchors.rightMargin: 32
+            anchors.rightMargin: 36
             anchors.bottom: bottomBar.top
-            anchors.bottomMargin: 16
+            anchors.bottomMargin: 20
 
-            // LEFT COLUMN: Vitals Telemetry + Scratchpad Notes (Notes persists in Focus Mode)
+            // LEFT COLUMN: System Vitals Telemetry + Quick Notes (Restrained, negative space)
             Column {
                 id: leftCol
                 anchors.left: parent.left
                 anchors.top: parent.top
                 width: 360
-                spacing: 14
+                spacing: 16
 
                 VitalsWidget {
                     id: vitalsWidget
@@ -306,13 +109,13 @@ PlasmoidItem {
                 }
             }
 
-            // CENTER COLUMN: Big Clock Hero (minute-dissolve + day-progress ticks) + Weather Forecast + Focus Exit Pill
+            // CENTER COLUMN: Big Clock Hero + AI Pills ("Claude" & "Gemini") + Compact Weather Chip
             Column {
                 id: centerCol
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
                 width: Math.max(300, parent.width - 760)
-                spacing: 14
+                spacing: 16
 
                 ClockWidget {
                     id: clockWidget
@@ -322,7 +125,14 @@ PlasmoidItem {
                     accentColor: root.accentColor
                 }
 
-                // Exit Focus Mode pill (appears under clock when Focus Mode is on)
+                // AI Launchers (Claude & Gemini Pills)
+                AiPillsWidget {
+                    id: aiPills
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    accentColor: root.accentColor
+                }
+
+                // Exit Focus Mode pill (only appears when Focus Mode is active)
                 Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
                     height: 32
@@ -364,9 +174,10 @@ PlasmoidItem {
                     }
                 }
 
+                // Compact "Today" Weather Chip
                 WeatherForecastWidget {
-                    id: weatherForecastWidget
-                    width: parent.width
+                    id: weatherChip
+                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showWeatherForecast && !root.focusModeActive
                     opacity: visible ? 1.0 : 0.0
                     accentColor: root.accentColor
@@ -380,23 +191,22 @@ PlasmoidItem {
                 anchors.right: parent.right
                 anchors.top: parent.top
                 width: 360
-                spacing: 14
+                spacing: 16
                 visible: !root.focusModeActive
                 opacity: visible ? 1.0 : 0.0
                 Behavior on opacity { NumberAnimation { duration: 300 } }
 
-                // ── 3. Unified "Now" Card (Priority: Pomodoro > Media > Calendar Event > Hidden) ──
+                // Unified "Now" Card (Priority: Pomodoro > Media > Calendar Event > Hidden)
                 NowCardWidget {
                     id: nowCardWidget
                     width: parent.width
                     accentColor: root.accentColor
-                    icsFilePath: root.icsFilePath
                     onPomodoroCompleted: {
                         glyphBorderLight.triggerPomodoroFlash();
                     }
                 }
 
-                // ── Quick Toggles with Focus Mode Toggle ──
+                // Quick Toggles with Focus Mode Toggle
                 QuickTogglesWidget {
                     id: quickTogglesWidget
                     width: parent.width
@@ -414,67 +224,52 @@ PlasmoidItem {
                     visible: root.showMonthCalendar || true
                     accentColor: root.accentColor
                 }
-
-                HabitsWidget {
-                    id: habitsWidget
-                    width: parent.width
-                    visible: root.showHabits
-                    accentColor: root.accentColor
-                }
-
-                ScreenshotsWidget {
-                    id: screenshotsWidget
-                    width: parent.width
-                    visible: root.showScreenshots
-                    accentColor: root.accentColor
-                }
             }
         }
 
-        // BOTTOM INTERACTIVE BAR: AI Prompt Runtime Bar & Quick Launch Dock
+        // BOTTOM BAR: Slim Quick Ask (Left) + Ambient Wave (Center) + Quick Launch Dock (Right)
+        // Clean layout with ZERO overlap/collision
         Item {
             id: bottomBar
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 12
+            anchors.bottomMargin: 24
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.leftMargin: 32
-            anchors.rightMargin: 32
-            height: 125
+            anchors.leftMargin: 36
+            anchors.rightMargin: 36
+            height: 72
             visible: !root.focusModeActive
             opacity: visible ? 1.0 : 0.0
             Behavior on opacity { NumberAnimation { duration: 300 } }
 
-            Row {
-                anchors.top: parent.top
+            // Left: Slim Single-Line Quick Ask Bar
+            QuickAskWidget {
+                id: quickAskWidget
                 anchors.left: parent.left
-                anchors.right: parent.right
-                spacing: 16
-
-                // Left: QuickAsk / Assistant Bar
-                QuickAskWidget {
-                    id: quickAskWidget
-                    width: parent.width - 380
-                    visible: root.showQuickAsk
-                    accentColor: root.accentColor
-                }
-
-                // Right: Quick Launch Utilities Dock
-                QuickLinksWidget {
-                    id: quickLinksWidget
-                    width: 364
-                    visible: root.showQuickLinks
-                    accentColor: root.accentColor
-                }
+                anchors.verticalCenter: parent.verticalCenter
+                width: 340
+                visible: root.showQuickAsk
+                accentColor: root.accentColor
             }
 
-            // Ambient Wave Floating Indicator at center bottom
+            // Center: Nothing Ambient Wave
             WaveWidget {
                 id: waveWidget
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
                 visible: root.showAssistantWave
                 accentColor: root.accentColor
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
+            }
+
+            // Right: Quick Launch Utilities Dock
+            QuickLinksWidget {
+                id: quickLinksWidget
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                width: 360
+                height: parent.height
+                visible: root.showQuickLinks
+                accentColor: root.accentColor
             }
         }
     }
