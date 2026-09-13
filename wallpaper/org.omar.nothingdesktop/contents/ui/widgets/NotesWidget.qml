@@ -81,7 +81,7 @@ Item {
                 // Clear note action
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
+                    
                     width: 24
                     height: 24
                     radius: 12

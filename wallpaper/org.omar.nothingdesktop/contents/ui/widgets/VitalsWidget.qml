@@ -164,7 +164,7 @@ Item {
 
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
+                    
                     width: 26
                     height: 26
                     radius: 13
@@ -398,7 +398,7 @@ Item {
                         }
                         Item { width: 1; height: 1 }
                         Text {
-                            anchors.right: parent.right
+                            
                             text: (root.activeMetric === "CPU" ? root.cpuVal : root.ramVal) + "% CURRENT"
                             font.family: Theme.fontDots
                             font.pixelSize: 9

@@ -19,9 +19,11 @@ Item {
 
     function toggleHabitDay(hIndex, dIndex) {
         var copy = JSON.parse(JSON.stringify(root.habits));
-        copy[hIndex].days[dIndex] = !copy[hIndex].days[dIndex];
-        root.habits = copy;
-        saveHabits();
+        if (copy[hIndex] && copy[hIndex].days) {
+            copy[hIndex].days[dIndex] = !copy[hIndex].days[dIndex];
+            root.habits = copy;
+            saveHabits();
+        }
     }
 
     P5Support.DataSource {
@@ -95,13 +97,15 @@ Item {
                 Repeater {
                     model: root.habits
                     delegate: Row {
+                        id: habitRow
                         width: parent.width
                         spacing: 8
                         readonly property int hIdx: index
+                        readonly property var habitItem: modelData
 
                         Text {
                             width: 110
-                            text: modelData.title
+                            text: (habitItem && habitItem.title) ? habitItem.title : ""
                             font.family: Theme.fontUi
                             font.pixelSize: 11
                             color: Theme.fg
@@ -117,7 +121,7 @@ Item {
                                 model: 7
                                 delegate: Rectangle {
                                     readonly property int dIdx: index
-                                    readonly property bool done: modelData.days[dIdx]
+                                    readonly property bool done: (habitRow.habitItem && habitRow.habitItem.days && habitRow.habitItem.days[dIdx]) ? true : false
                                     width: 18
                                     height: 18
                                     radius: 9
@@ -137,7 +141,7 @@ Item {
                                     MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
-                                        onClicked: root.toggleHabitDay(hIdx, dIdx)
+                                        onClicked: root.toggleHabitDay(habitRow.hIdx, dIdx)
                                     }
                                 }
                             }

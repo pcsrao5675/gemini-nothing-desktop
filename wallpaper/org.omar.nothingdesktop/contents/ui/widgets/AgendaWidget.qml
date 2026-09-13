@@ -129,7 +129,7 @@ Item {
                 // Calendar App Launch Button
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
+                    
                     width: 26
                     height: 26
                     radius: 13

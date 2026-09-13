@@ -85,7 +85,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                Item { width: 1; height: 1; Layout.fillWidth: true }
+                Item { width: 1; height: 1 }
             }
 
             // Big Clock Countdown Display
